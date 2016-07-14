@@ -28,6 +28,7 @@ This is territory of Go, so no getter and setters!
 type V2RayPoint struct {
 	ConfigureFile string
 	OnEmitStatus  *func(StatusCode int, Status string) int
+	vpoint        *point.Point
 }
 
 func (v *V2RayPoint) pointloop() {
@@ -52,10 +53,17 @@ func (v *V2RayPoint) pointloop() {
 		return
 	}
 	vPoint.Start()
+	v.vpoint = vPoint
 }
 
 /*RunLoop Run V2Ray main loop
  */
 func (v *V2RayPoint) RunLoop() {
 	go v.pointloop()
+}
+
+/*StopLoop Stop V2Ray main loop
+ */
+func (v *V2RayPoint) StopLoop() {
+	v.vpoint.Close()
 }
