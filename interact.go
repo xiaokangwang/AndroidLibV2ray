@@ -27,17 +27,28 @@ This is territory of Go, so no getter and setters!
 */
 type V2RayPoint struct {
 	ConfigureFile string
-	OnEmitStatus  *func(StatusCode int, Status string) int
+	Callbacks     V2RayCallbacks
 	vpoint        *point.Point
+	IsRunning     bool
+	conf          *libv2rayconf
+}
+
+/*V2RayCallbacks a Callback set for V2Ray
+ */
+type V2RayCallbacks interface {
+	OnEmitStatus(int, string) int
 }
 
 func (v *V2RayPoint) pointloop() {
+	//	if v.parseConf() != nil {
+	//		return
+	//	}
 	config, err := point.LoadConfig(v.ConfigureFile)
 	if err != nil {
 		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)
-		if v.OnEmitStatus != nil {
-			(*v.OnEmitStatus)(-1, "Failed to read config file ("+v.ConfigureFile+")")
-		}
+
+		v.Callbacks.OnEmitStatus(-1, "Failed to read config file ("+v.ConfigureFile+")")
+
 		return
 	}
 	if config.LogConfig != nil && len(config.LogConfig.AccessLog) > 0 {
@@ -47,13 +58,16 @@ func (v *V2RayPoint) pointloop() {
 	vPoint, err := point.NewPoint(config)
 	if err != nil {
 		log.Error("Failed to create Point server: ", err)
-		if v.OnEmitStatus != nil {
-			(*v.OnEmitStatus)(-1, "Failed to create Point server ("+err.Error()+")")
-		}
+
+		v.Callbacks.OnEmitStatus(-1, "Failed to create Point server ("+err.Error()+")")
+
 		return
 	}
+	v.IsRunning = true
 	vPoint.Start()
 	v.vpoint = vPoint
+
+	v.Callbacks.OnEmitStatus(0, "Running")
 }
 
 /*RunLoop Run V2Ray main loop
@@ -65,5 +79,12 @@ func (v *V2RayPoint) RunLoop() {
 /*StopLoop Stop V2Ray main loop
  */
 func (v *V2RayPoint) StopLoop() {
+	v.IsRunning = false
 	v.vpoint.Close()
+	v.Callbacks.OnEmitStatus(0, "Closed")
+}
+
+/*NewV2RayPoint new V2RayPoint*/
+func NewV2RayPoint() *V2RayPoint {
+	return &V2RayPoint{}
 }
