@@ -40,9 +40,9 @@ type V2RayCallbacks interface {
 }
 
 func (v *V2RayPoint) pointloop() {
-	//	if v.parseConf() != nil {
-	//		return
-	//	}
+	if v.parseConf() != nil {
+		return
+	}
 	config, err := point.LoadConfig(v.ConfigureFile)
 	if err != nil {
 		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)
