@@ -43,6 +43,15 @@ func (v *V2RayPoint) pointloop() {
 	if v.parseConf() != nil {
 		return
 	}
+
+	err := checkIfRcExist()
+
+	if err != nil {
+		log.Error("Failed to copy asset", err)
+		v.Callbacks.OnEmitStatus(-1, "Failed to copy asset ("+err.Error()+")")
+
+	}
+
 	config, err := point.LoadConfig(v.ConfigureFile)
 	if err != nil {
 		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)

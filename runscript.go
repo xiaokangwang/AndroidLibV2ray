@@ -12,6 +12,7 @@ func runbash(cc string, env []string) error {
 	cmd.Stderr = os.Stderr
 	env = append(env, os.Environ()...)
 	env = append(env, "proxyuid="+strconv.Itoa(os.Getuid()))
+	env = append(env, "datadir="+datadir)
 	cmd.Env = env
 	err := cmd.Run()
 	return err
