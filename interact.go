@@ -67,6 +67,14 @@ func (v *V2RayPoint) pointloop() {
 	vPoint.Start()
 	v.vpoint = vPoint
 
+	if v.conf != nil {
+		env := v.conf.additionalEnv
+		err = runbash(v.conf.upscript, env)
+		if err != nil {
+			log.Error("OnUp failed to exec: ", err)
+		}
+	}
+
 	v.Callbacks.OnEmitStatus(0, "Running")
 }
 
@@ -81,6 +89,16 @@ func (v *V2RayPoint) RunLoop() {
 func (v *V2RayPoint) StopLoop() {
 	v.IsRunning = false
 	v.vpoint.Close()
+
+	if v.conf != nil {
+		env := v.conf.additionalEnv
+		err := runbash(v.conf.downscript, env)
+
+		if err != nil {
+			log.Error("OnDown failed to exec: ", err)
+		}
+	}
+
 	v.Callbacks.OnEmitStatus(0, "Closed")
 }
 
