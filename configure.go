@@ -1,6 +1,8 @@
 package libv2ray
 
 import (
+	"encoding/json"
+	"errors"
 	"os"
 
 	"log"
@@ -12,6 +14,20 @@ type libv2rayconf struct {
 	upscript      string
 	downscript    string
 	additionalEnv []string
+	esco          []libv2rayconfEscortTarget
+	rend          []libv2rayconfRenderCfgTarget
+}
+
+type libv2rayconfEscortTarget struct {
+	Target      string   `json:"Target"`
+	Args        []string `json:"Args"`
+	Forgiveable bool     `json:"Forgiveable"`
+}
+
+type libv2rayconfRenderCfgTarget struct {
+	Target string   `json:"Target"`
+	Args   []string `json:"Args"`
+	Source string   `json:"Source"`
 }
 
 func (v *V2RayPoint) parseConf() error {
@@ -45,10 +61,47 @@ func (v *V2RayPoint) parseConf() error {
 
 	v.conf.upscript = jsonStringDefault(libconf.GetPath("listener", "onUp"), "#none")
 	v.conf.downscript = jsonStringDefault(libconf.GetPath("listener", "onDown"), "#none")
-	v.conf.additionalEnv, err = libconf.GetPath("listener", "env").StringArray()
+	v.conf.additionalEnv, err = libconf.GetPath("env").StringArray()
 	if err != nil {
 		v.Callbacks.OnEmitStatus(-2, err.Error())
 		return err
+	}
+
+	escortconfjson, exist := libconf.CheckGet("escort")
+	if exist {
+		/*
+			var ok bool
+			v.conf.esco, ok = escortconfjson.Interface().([]libv2rayconfEscortTarget)
+			if !ok {
+				v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config escort")
+				return errors.New("Failed Type Assert: Config escort")
+			}*/
+		esco, ok := escortconfjson.MarshalJSON()
+		if ok != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config escort")
+			return errors.New("Failed Type Assert: Config escort")
+		}
+		err := json.Unmarshal(esco, &v.conf.esco)
+		if err != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config escortX")
+			return errors.New("Failed Type Assert: Config escortX")
+		}
+
+	}
+
+	renderconfjson, exist := libconf.CheckGet("render")
+	if exist {
+		rend, ok := renderconfjson.MarshalJSON()
+		if ok != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config render")
+			return errors.New("Failed Type Assert: Config render")
+		}
+		err := json.Unmarshal(rend, &v.conf.rend)
+		if err != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config renderX")
+			log.Println(err, "Failed Type Assert: Config renderX")
+			return errors.New("Failed Type Assert: Config renderX")
+		}
 	}
 
 	return nil
