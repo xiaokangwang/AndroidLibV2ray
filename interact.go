@@ -34,6 +34,7 @@ type V2RayPoint struct {
 	conf             *libv2rayconf
 	escortProcess    *[](*os.Process)
 	unforgivnesschan chan int
+	VpnSupportSet    V2RayVPNServiceSupportsSet
 }
 
 /*V2RayCallbacks a Callback set for V2Ray

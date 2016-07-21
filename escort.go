@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool) {
+func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool, tapfd int) {
 	count := 42
 	for count > 0 {
 		cmd := exec.Command(proc, pt...)
@@ -17,6 +17,13 @@ func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool) {
 		env = append(env, os.Environ()...)
 		env = v.addEnvironment(env)
 		cmd.Env = env
+
+		if tapfd != 0 {
+			file := os.NewFile(uintptr(tapfd), "/dev/tap0")
+			var files []*os.File
+			cmd.ExtraFiles = append(files, file)
+		}
+
 		err := cmd.Start()
 		log.Println(proc)
 		log.Println(pt)
@@ -43,7 +50,7 @@ func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool) {
 }
 
 func (v *V2RayPoint) escortBeg(proc string, pt []string, forgiveable bool) {
-	go v.escortRun(proc, pt, forgiveable)
+	go v.escortRun(proc, pt, forgiveable, 0)
 }
 
 func (v *V2RayPoint) unforgivenessCloser() {

@@ -16,6 +16,7 @@ type libv2rayconf struct {
 	additionalEnv []string
 	esco          []libv2rayconfEscortTarget
 	rend          []libv2rayconfRenderCfgTarget
+	vpnConfig     vpnserviceConfig
 }
 
 type libv2rayconfEscortTarget struct {
