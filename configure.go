@@ -105,6 +105,21 @@ func (v *V2RayPoint) parseConf() error {
 		}
 	}
 
+	vpnConfigconfjson, exist := libconf.CheckGet("render")
+	if exist {
+		vpnConfig, ok := vpnConfigconfjson.MarshalJSON()
+		if ok != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config vpnConfig")
+			return errors.New("Failed Type Assert: Config vpnConfig")
+		}
+		err := json.Unmarshal(vpnConfig, &v.conf.vpnConfig)
+		if err != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config vpnConfigX")
+			log.Println(err, "Failed Type Assert: Config vpnConfigX")
+			return errors.New("Failed Type Assert: Config vpnConfigX")
+		}
+	}
+
 	return nil
 }
 
