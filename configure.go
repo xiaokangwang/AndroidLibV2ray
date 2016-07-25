@@ -105,7 +105,7 @@ func (v *V2RayPoint) parseConf() error {
 		}
 	}
 
-	vpnConfigconfjson, exist := libconf.CheckGet("render")
+	vpnConfigconfjson, exist := libconf.CheckGet("vpnservice")
 	if exist {
 		vpnConfig, ok := vpnConfigconfjson.MarshalJSON()
 		if ok != nil {

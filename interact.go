@@ -87,6 +87,8 @@ func (v *V2RayPoint) pointloop() {
 	log.Info("v.escortingUP() ")
 	v.escortingUP()
 
+	v.vpnSetup()
+
 	if v.conf != nil {
 		env := v.conf.additionalEnv
 		log.Info("Exec Upscript() ")
@@ -128,6 +130,7 @@ func (v *V2RayPoint) stopLoopW() {
 /*StopLoop Stop V2Ray main loop
  */
 func (v *V2RayPoint) StopLoop() {
+	v.vpnShutdown()
 	go v.stopLoopW()
 }
 

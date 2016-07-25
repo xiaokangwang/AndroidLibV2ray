@@ -11,6 +11,7 @@ import (
 func (v *V2RayPoint) renderAll() {
 	v.renderesco()
 	v.renderptm()
+	v.rendervpn()
 }
 
 func (v *V2RayPoint) renderptm() {
@@ -70,4 +71,18 @@ func (v *V2RayPoint) renderesco() {
 			v.conf.esco[key].Args[key2] = os.Expand(v.conf.esco[key].Args[key2], mf)
 		}
 	}
+}
+
+func (v *V2RayPoint) rendervpn() {
+	envr := envToMap(v.getEnvironment())
+	mf := func(lookup string) string {
+		if envl, ok := envr[lookup]; ok {
+			return envl
+		}
+		return ""
+	}
+	for key := range v.conf.vpnConfig.Args {
+		v.conf.vpnConfig.Args[key] = os.Expand(v.conf.vpnConfig.Args[key], mf)
+	}
+	v.conf.vpnConfig.Target = os.Expand(v.conf.vpnConfig.Target, mf)
 }

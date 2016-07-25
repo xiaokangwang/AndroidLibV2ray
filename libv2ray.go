@@ -4,5 +4,5 @@ package libv2ray
 This func will return libv2ray binding version.
 */
 func CheckVersion() int {
-	return 8
+	return 10
 }
