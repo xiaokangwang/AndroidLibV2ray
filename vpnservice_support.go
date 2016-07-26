@@ -1,50 +1,81 @@
 package libv2ray
 
 import (
+	"fmt"
+	"log"
 	"net"
-	"time"
+	"os"
+
+	"golang.org/x/sys/unix"
 )
 
-type surrogateDialer struct {
-	Timeout       time.Duration
-	Deadline      time.Time
-	LocalAddr     net.Addr
-	DualStack     bool
-	FallbackDelay time.Duration
-	KeepAlive     time.Duration
-	Cancel        <-chan struct{}
+type vpnProtectedDialer struct {
+	vp *V2RayPoint
 }
 
-/*
-type surrogateConn struct {
+func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, error) {
+	addr, err := net.ResolveTCPAddr(network, Address)
+	if err != nil {
+		return nil, err
+	}
+	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_STREAM, unix.IPPROTO_TCP)
+	if err != nil {
+		return nil, err
+	}
+
+	//Protect socket fd!
+	log.Println("Protecting Sock:", fd)
+	sDialer.vp.VpnSupportSet.Protect(fd)
+
+	sa := new(unix.SockaddrInet6)
+	sa.Port = addr.Port
+	sa.ZoneId = uint32(zoneToInt(addr.Zone))
+	fmt.Println(addr.IP.To16())
+	copy(sa.Addr[:], addr.IP.To16())
+	fmt.Println(sa.Addr)
+	err = unix.Connect(fd, sa)
+	if err != nil {
+		return nil, err
+	}
+
+	file := os.NewFile(uintptr(fd), "Socket")
+	conn, err := net.FileConn(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn, nil
 }
 
-func (sc *surrogateConn) Read(b []byte) (n int, err error) {
-	return 0, nil
-}
-func (sc *surrogateConn) Write(b []byte) (n int, err error) {
-	return 0, nil
-}
-func (sc *surrogateConn) Close() error {
-	return nil
-}
-func (sc *surrogateConn) LocalAddr() net.Addr {
-	return nil
-}
-func (sc *surrogateConn) RemoteAddr() net.Addr {
-	return nil
-}
-func (sc *surrogateConn) SetDeadline(t time.Time) error {
-	return nil
-}
-func (sc *surrogateConn) SetReadDeadline(t time.Time) error {
-	return nil
-}
-func (sc *surrogateConn) SetWriteDeadline(t time.Time) error {
-	return nil
+// Bigger than we need, not too big to worry about overflow
+const big = 0xFFFFFF
 
+// Decimal to integer starting at &s[i0].
+// Returns number, new offset, success.
+func dtoi(s string, i0 int) (n int, i int, ok bool) {
+	n = 0
+	for i = i0; i < len(s) && '0' <= s[i] && s[i] <= '9'; i++ {
+		n = n*10 + int(s[i]-'0')
+		if n >= big {
+			return 0, i, false
+		}
+	}
+	if i == i0 {
+		return 0, i, false
+	}
+	return n, i, true
 }
-*/
+
+func zoneToInt(zone string) int {
+	if zone == "" {
+		return 0
+	}
+	if ifi, err := net.InterfaceByName(zone); err == nil {
+		return ifi.Index
+	}
+	n, _, _ := dtoi(zone, 0)
+	return n
+}
 
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
 type V2RayVPNServiceSupportsSet interface {
@@ -52,4 +83,5 @@ type V2RayVPNServiceSupportsSet interface {
 	Setup(Conf string) int
 	Prepare() int
 	Shutdown() int
+	Protect(int) int
 }

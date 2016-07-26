@@ -35,6 +35,7 @@ type V2RayPoint struct {
 	escortProcess    *[](*os.Process)
 	unforgivnesschan chan int
 	VpnSupportSet    V2RayVPNServiceSupportsSet
+	VpnSupportnodup  bool
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -44,6 +45,7 @@ type V2RayCallbacks interface {
 }
 
 func (v *V2RayPoint) pointloop() {
+	v.VpnSupportnodup = false
 	if v.parseConf() != nil {
 		return
 	}
