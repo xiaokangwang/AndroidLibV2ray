@@ -1,7 +1,6 @@
 package libv2ray
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -30,9 +29,9 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 	sa := new(unix.SockaddrInet6)
 	sa.Port = addr.Port
 	sa.ZoneId = uint32(zoneToInt(addr.Zone))
-	fmt.Println(addr.IP.To16())
+	//fmt.Println(addr.IP.To16())
 	copy(sa.Addr[:], addr.IP.To16())
-	fmt.Println(sa.Addr)
+	//fmt.Println(sa.Addr)
 	err = unix.Connect(fd, sa)
 	if err != nil {
 		return nil, err

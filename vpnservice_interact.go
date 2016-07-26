@@ -3,6 +3,8 @@ package libv2ray
 import (
 	"log"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/v2ray/v2ray-core/transport/internet"
 )
 
@@ -32,6 +34,7 @@ func (v *V2RayPoint) vpnSetup() {
 func (v *V2RayPoint) vpnShutdown() {
 	v.VpnSupportnodup = false
 	if v.conf.vpnConfig.VPNSetupArg != "" {
+		unix.Close(v.VpnSupportSet.GetVPNFd())
 		v.VpnSupportSet.Shutdown()
 	}
 }
