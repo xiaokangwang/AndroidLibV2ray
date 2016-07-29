@@ -1,9 +1,11 @@
 package libv2ray
 
 import (
+	"errors"
 	"log"
 	"net"
 	"os"
+	"strings"
 
 	"golang.org/x/sys/unix"
 )
@@ -13,37 +15,76 @@ type vpnProtectedDialer struct {
 }
 
 func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, error) {
-	addr, err := net.ResolveTCPAddr(network, Address)
-	if err != nil {
-		return nil, err
-	}
-	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_STREAM, unix.IPPROTO_TCP)
-	if err != nil {
-		return nil, err
+	if strings.HasPrefix(network, "tcp") {
+		addr, err := net.ResolveTCPAddr(network, Address)
+		if err != nil {
+			return nil, err
+		}
+		fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_STREAM, unix.IPPROTO_TCP)
+		if err != nil {
+			return nil, err
+		}
+
+		//Protect socket fd!
+		log.Println("Protecting Sock:", fd)
+		sDialer.vp.VpnSupportSet.Protect(fd)
+
+		sa := new(unix.SockaddrInet6)
+		sa.Port = addr.Port
+		sa.ZoneId = uint32(zoneToInt(addr.Zone))
+		//fmt.Println(addr.IP.To16())
+		copy(sa.Addr[:], addr.IP.To16())
+		//fmt.Println(sa.Addr)
+		err = unix.Connect(fd, sa)
+		if err != nil {
+			return nil, err
+		}
+
+		file := os.NewFile(uintptr(fd), "Socket")
+		conn, err := net.FileConn(file)
+		if err != nil {
+			return nil, err
+		}
+
+		return conn, nil
 	}
 
-	//Protect socket fd!
-	log.Println("Protecting Sock:", fd)
-	sDialer.vp.VpnSupportSet.Protect(fd)
+	if strings.HasPrefix(network, "udp") {
 
-	sa := new(unix.SockaddrInet6)
-	sa.Port = addr.Port
-	sa.ZoneId = uint32(zoneToInt(addr.Zone))
-	//fmt.Println(addr.IP.To16())
-	copy(sa.Addr[:], addr.IP.To16())
-	//fmt.Println(sa.Addr)
-	err = unix.Connect(fd, sa)
-	if err != nil {
-		return nil, err
+		addr, err := net.ResolveUDPAddr(network, Address)
+		if err != nil {
+			return nil, err
+		}
+		fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, unix.IPPROTO_UDP)
+		if err != nil {
+			return nil, err
+		}
+
+		//Protect socket fd!
+		log.Println("Protecting Sock:", fd)
+		sDialer.vp.VpnSupportSet.Protect(fd)
+
+		sa := new(unix.SockaddrInet6)
+		sa.Port = addr.Port
+		sa.ZoneId = uint32(zoneToInt(addr.Zone))
+		//fmt.Println(addr.IP.To16())
+		copy(sa.Addr[:], addr.IP.To16())
+		//fmt.Println(sa.Addr)
+		err = unix.Connect(fd, sa)
+		if err != nil {
+			return nil, err
+		}
+
+		file := os.NewFile(uintptr(fd), "Socket")
+		conn, err := net.FileConn(file)
+		if err != nil {
+			return nil, err
+		}
+
+		return conn, nil
+
 	}
-
-	file := os.NewFile(uintptr(fd), "Socket")
-	conn, err := net.FileConn(file)
-	if err != nil {
-		return nil, err
-	}
-
-	return conn, nil
+	return nil, errors.New("Pto udf")
 }
 
 // Bigger than we need, not too big to worry about overflow
