@@ -1,0 +1,141 @@
+{
+  "port": 10808,
+  "log": {
+    "access": "",
+    "error": "",
+    "loglevel": "info"
+  },
+  "inbound": {
+    "protocol": "socks",
+    "settings": {
+      "auth": "noauth",
+      "udp": false,
+      "ip": "127.0.0.1"
+    }
+  },
+  "inboundDetour": [
+    {
+      "protocol": "http",
+      "port": 10845,
+      "settings": {},
+      "ip": "127.0.0.1"
+    },
+    {
+      "protocol": "dokodemo-door",
+      "ip": "127.0.0.1",
+      "port": 10846,
+      "settings": {
+        "network": "tcp",
+        "timeout": 0,
+        "followRedirect": true
+      }
+    },
+    {
+      "protocol": "dokodemo-door",
+      "ip": "127.0.0.1",
+      "port": 5353,
+      "settings": {
+        "network": "tcp",
+        "timeout": 120,
+        "address": "208.67.222.222",
+        "port": 53,
+        "followRedirect": false
+      }
+    }
+  ],
+  "outbound": {
+    "protocol": "vmess",
+    "settings": {
+      "vnext": [
+        {
+          "address": "-----",
+          "port": 10086,
+          "users": [
+            {
+              "id": "------",
+              "alterId": 64
+            }
+          ]
+        }
+      ]
+    },
+    "streamSettings": {
+      "network": "tcp",
+      "security": "none",
+      "tlsSettings": {
+        "allowInsecure": true
+      }
+    }
+  },
+  "outboundDetour": [
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    }
+  ],
+  "routing": {
+    "strategy": "rules",
+    "settings": {
+      "rules": [
+        {
+          "type": "field",
+          "ip": [
+            "0.0.0.0/8",
+            "10.0.0.0/8",
+            "100.64.0.0/10",
+            "127.0.0.0/8",
+            "169.254.0.0/16",
+            "172.16.0.0/12",
+            "192.0.0.0/24",
+            "192.0.2.0/24",
+            "192.168.0.0/16",
+            "198.18.0.0/15",
+            "198.51.100.0/24",
+            "203.0.113.0/24",
+            "::1/128",
+            "fc00::/7",
+            "fe80::/10"
+          ],
+          "outboundTag": "direct"
+        }
+      ]
+    }
+  },
+  "transport": {
+  },
+  "#lib2ray": {
+    "enabled": true,
+    "listener": {
+      "onUp": "export PATH=$PATH:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin;env;su -c 'iptables -t nat -N V2RAY;iptables -t nat -A V2RAY -d 127.0.0.0/8 -j RETURN;iptables -t nat -A V2RAY -m owner --uid-owner $proxyuid -j RETURN;iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports $V2RayTransProxyPort; iptables -t nat -A OUTPUT -p tcp -j V2RAY;iptables -t nat -A OUTPUT -p udp --dport 53 -j DNAT --to 127.0.0.1:$DNSForwardingProxyPort;';",
+      "onDown": "PATH=$PATH:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin;su -c 'iptables -D OUTPUT -t nat  -p tcp -j V2RAY;iptables -F V2RAY -t nat;iptables -X V2RAY -t nat;iptables -t nat -D OUTPUT -p udp --dport 53 -j DNAT --to 127.0.0.1:$DNSForwardingProxyPort;';"
+    },
+    "env": [
+      "V2RayTransProxyPort=10846",
+      "V2RayDNSPort=5353",
+      "DNSForwardingProxyPort=5350"
+    ],
+    "render":[
+      {
+        "Target":"${datadir}pdnsdconf.conf",
+        "Source":"${datadir}pdnsd-te.conf",
+        "Args":[
+          "pdnsdCachedDir=${datadir}",
+          "pdnsdListenIP=127.0.0.1",
+          "pdnsdListenPort=$DNSForwardingProxyPort",
+          "OriginPort=$V2RayDNSPort"
+        ]
+      }
+    ],
+    "escort":[
+      {
+        "Target":"${datadir}pdnsd",
+        "Args":[
+          "-c",
+          "${datadir}pdnsdconf.conf","-g"
+        ],
+        "Forgiveable":false
+      }
+    ]
+  }
+}
