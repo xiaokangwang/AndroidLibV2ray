@@ -10,7 +10,7 @@
     "settings": {
       "auth": "noauth",
       "udp": true,
-      "ip": "127.0.0.1"
+      "listen": "127.0.0.1"
     }
   },
   "inboundDetour": [
@@ -18,11 +18,11 @@
       "protocol": "http",
       "port": 10845,
       "settings": {},
-      "ip": "127.0.0.1"
+      "listen": "127.0.0.1"
     },
     {
       "protocol": "dokodemo-door",
-      "ip": "127.0.0.1",
+      "listen": "127.0.0.1",
       "port": 10846,
       "settings": {
         "network": "tcp",
@@ -32,7 +32,7 @@
     },
     {
       "protocol": "dokodemo-door",
-      "ip": "127.0.0.1",
+  "listen": "127.0.0.1",
       "port": 5353,
       "settings": {
         "network": "tcp",
