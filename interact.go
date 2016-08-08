@@ -21,6 +21,10 @@ import (
 	_ "github.com/v2ray/v2ray-core/transport/internet/kcp"
 	_ "github.com/v2ray/v2ray-core/transport/internet/tcp"
 	_ "github.com/v2ray/v2ray-core/transport/internet/udp"
+
+	// The following are necessary as they register handlers in their init functions.
+	_ "github.com/v2ray/v2ray-core/transport/internet/authenticators/noop"
+	_ "github.com/v2ray/v2ray-core/transport/internet/authenticators/srtp"
 )
 
 /*V2RayPoint V2Ray Point Server
