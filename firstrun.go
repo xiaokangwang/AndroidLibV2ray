@@ -10,9 +10,9 @@ import (
 	"golang.org/x/mobile/asset"
 )
 
-const datadir = "/data/data/org.kkdev.v2raygo/"
+func (v *V2RayPoint) checkIfRcExist() error {
+	datadir := v.getDataDir()
 
-func checkIfRcExist() error {
 	if _, err := os.Stat(datadir + strconv.Itoa(CheckVersion())); !os.IsNotExist(err) {
 		return nil
 	}
@@ -75,4 +75,12 @@ func checkIfRcExist() error {
 	s.Close()
 
 	return nil
+}
+
+func (v *V2RayPoint) getDataDir() string {
+	var datadir = "/data/data/com.kkdev.v2ray/"
+	if v.PackageName != "" {
+		datadir = "/data/data/" + v.PackageName + "/"
+	}
+	return datadir
 }

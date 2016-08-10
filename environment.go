@@ -8,6 +8,7 @@ import (
 )
 
 func (v *V2RayPoint) addEnvironment(env []string) []string {
+	datadir := v.getDataDir()
 	env = append(env, "proxyuid="+strconv.Itoa(os.Getuid()))
 	env = append(env, "datadir="+datadir)
 	env = append(env, "cfgdir="+filepath.Dir(v.ConfigureFile)+"")

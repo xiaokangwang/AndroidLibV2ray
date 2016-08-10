@@ -40,6 +40,7 @@ type V2RayPoint struct {
 	unforgivnesschan chan int
 	VpnSupportSet    V2RayVPNServiceSupportsSet
 	VpnSupportnodup  bool
+	PackageName      string
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -54,7 +55,7 @@ func (v *V2RayPoint) pointloop() {
 		return
 	}
 
-	err := checkIfRcExist()
+	err := v.checkIfRcExist()
 
 	if err != nil {
 		log.Error("Failed to copy asset", err)
