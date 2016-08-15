@@ -25,6 +25,7 @@ import (
 	// The following are necessary as they register handlers in their init functions.
 	_ "github.com/v2ray/v2ray-core/transport/internet/authenticators/noop"
 	_ "github.com/v2ray/v2ray-core/transport/internet/authenticators/srtp"
+	_ "github.com/v2ray/v2ray-core/transport/internet/authenticators/utp"
 )
 
 /*V2RayPoint V2Ray Point Server
