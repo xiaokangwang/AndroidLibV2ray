@@ -78,7 +78,7 @@ func (v *V2RayPoint) checkIfRcExist() error {
 }
 
 func (v *V2RayPoint) getDataDir() string {
-	var datadir = "/data/data/com.kkdev.v2ray/"
+	var datadir = "/data/data/org.kkdev.v2raygo/"
 	if v.PackageName != "" {
 		datadir = "/data/data/" + v.PackageName + "/"
 	}

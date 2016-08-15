@@ -32,11 +32,14 @@ func (v *V2RayPoint) vpnSetup() {
 	}
 }
 func (v *V2RayPoint) vpnShutdown() {
-	v.VpnSupportnodup = false
+
 	if v.conf.vpnConfig.VPNSetupArg != "" {
-		unix.Close(v.VpnSupportSet.GetVPNFd())
+		if v.VpnSupportnodup {
+			unix.Close(v.VpnSupportSet.GetVPNFd())
+		}
 		v.VpnSupportSet.Shutdown()
 	}
+	v.VpnSupportnodup = false
 }
 
 func (v *V2RayPoint) setV2RayDialer() {
