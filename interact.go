@@ -21,6 +21,7 @@ import (
 	_ "github.com/v2ray/v2ray-core/transport/internet/kcp"
 	_ "github.com/v2ray/v2ray-core/transport/internet/tcp"
 	_ "github.com/v2ray/v2ray-core/transport/internet/udp"
+	_ "github.com/v2ray/v2ray-core/transport/internet/ws"
 
 	// The following are necessary as they register handlers in their init functions.
 	_ "github.com/v2ray/v2ray-core/transport/internet/authenticators/noop"
@@ -145,4 +146,12 @@ func (v *V2RayPoint) StopLoop() {
 /*NewV2RayPoint new V2RayPoint*/
 func NewV2RayPoint() *V2RayPoint {
 	return &V2RayPoint{unforgivnesschan: make(chan int)}
+}
+
+/*NetworkInterrupted inform us to restart the v2ray,
+closing dead connections.
+*/
+func (v *V2RayPoint) NetworkInterrupted() {
+	v.vpoint.Close()
+	v.vpoint.Start()
 }
