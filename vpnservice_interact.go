@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/v2ray/v2ray-core/transport/internet"
+	"v2ray.com/core/transport/internet"
 )
 
 /*VpnSupportReady VpnSupportReady*/
