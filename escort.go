@@ -86,6 +86,9 @@ func (v *V2RayPoint) escortingUP() {
 }
 func (v *V2RayPoint) escortingDown() {
 	log.Println("escortingDown() Killing all escorted process ")
+	if v.escortProcess == nil {
+		return
+	}
 	for _, pr := range *v.escortProcess {
 		pr.Kill()
 	}
