@@ -31,18 +31,25 @@ import (
 
 /*V2RayPoint V2Ray Point Server
 This is territory of Go, so no getter and setters!
+
+Notice:
+ConfigureFile can be either the path of config file or
+"V2Ray_internal/ConfigureFileContent" in case you wish to
+
 */
 type V2RayPoint struct {
-	ConfigureFile    string
-	Callbacks        V2RayCallbacks
-	vpoint           *point.Point
-	IsRunning        bool
-	conf             *libv2rayconf
-	escortProcess    *[](*os.Process)
-	unforgivnesschan chan int
-	VpnSupportSet    V2RayVPNServiceSupportsSet
-	VpnSupportnodup  bool
-	PackageName      string
+	ConfigureFile        string
+	ConfigureFileContent string
+	Callbacks            V2RayCallbacks
+	vpoint               *point.Point
+	IsRunning            bool
+	conf                 *libv2rayconf
+	escortProcess        *[](*os.Process)
+	unforgivnesschan     chan int
+	VpnSupportSet        V2RayVPNServiceSupportsSet
+	VpnSupportnodup      bool
+	PackageName          string
+	cfgtmpvarsi          cfgtmpvars
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -68,7 +75,7 @@ func (v *V2RayPoint) pointloop() {
 	log.Info("v.renderAll() ")
 	v.renderAll()
 
-	config, err := point.LoadConfig(v.ConfigureFile)
+	config, err := point.LoadConfig(v.parseCfg())
 	if err != nil {
 		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)
 
@@ -108,6 +115,7 @@ func (v *V2RayPoint) pointloop() {
 	}
 
 	v.Callbacks.OnEmitStatus(0, "Running")
+	v.parseCfgDone()
 }
 
 /*RunLoop Run V2Ray main loop
