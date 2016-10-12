@@ -60,6 +60,7 @@ type V2RayCallbacks interface {
 
 func (v *V2RayPoint) pointloop() {
 	v.VpnSupportnodup = false
+
 	if v.parseConf() != nil {
 		return
 	}

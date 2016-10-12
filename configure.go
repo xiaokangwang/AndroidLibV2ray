@@ -3,7 +3,6 @@ package libv2ray
 import (
 	"encoding/json"
 	"errors"
-	"os"
 
 	"log"
 
@@ -32,13 +31,7 @@ type libv2rayconfRenderCfgTarget struct {
 }
 
 func (v *V2RayPoint) parseConf() error {
-	fconffd, err := os.Open(v.ConfigureFile)
-	if err != nil {
-		v.Callbacks.OnEmitStatus(-2, "Failed to read config file ("+v.ConfigureFile+"):"+err.Error())
-		return err
-	}
-	defer fconffd.Close()
-	jsoncf, err := simplejson.NewFromReader(fconffd)
+	jsoncf, err := simplejson.NewFromReader(v.parseCfg())
 	if err != nil {
 		v.Callbacks.OnEmitStatus(-2, err.Error())
 		return err
