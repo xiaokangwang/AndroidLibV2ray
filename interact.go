@@ -3,8 +3,8 @@ package libv2ray
 import (
 	"os"
 	// The following are necessary as they register handlers in their init functions.
+	"v2ray.com/core"
 	"v2ray.com/core/common/log"
-	"v2ray.com/core/shell/point"
 
 	// The following are necessary as they register handlers in their init functions.
 	_ "v2ray.com/core/proxy/blackhole"
@@ -40,7 +40,7 @@ type V2RayPoint struct {
 	ConfigureFile        string
 	ConfigureFileContent string
 	Callbacks            V2RayCallbacks
-	vpoint               *point.Point
+	vpoint               *core.Point
 	IsRunning            bool
 	conf                 *libv2rayconf
 	escortProcess        *[](*os.Process)
@@ -75,7 +75,7 @@ func (v *V2RayPoint) pointloop() {
 	log.Info("v.renderAll() ")
 	v.renderAll()
 
-	config, err := point.LoadConfig(v.parseCfg())
+	config, err := core.LoadConfig(v.parseCfg())
 	if err != nil {
 		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)
 
@@ -84,7 +84,7 @@ func (v *V2RayPoint) pointloop() {
 		return
 	}
 
-	vPoint, err := point.NewPoint(config)
+	vPoint, err := core.NewPoint(config)
 	if err != nil {
 		log.Error("Failed to create Point server: ", err)
 
