@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"v2ray.com/core"
+	_ "v2ray.com/core/main/distro/all"
 )
 
 /*CheckVersion int
