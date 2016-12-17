@@ -11,7 +11,7 @@ import (
 This func will return libv2ray binding version.
 */
 func CheckVersion() int {
-	return 20
+	return 21
 }
 
 /*CheckVersionX string

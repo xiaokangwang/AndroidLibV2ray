@@ -4,6 +4,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	v2rayJsonWithComment "v2ray.com/core/tools/conf/json"
 )
 
 type cfgtmpvars struct {
@@ -20,7 +22,8 @@ func (v *V2RayPoint) parseCfg() io.Reader {
 		v.Callbacks.OnEmitStatus(-1, "Failed to read config file ("+v.ConfigureFile+")")
 	}
 	v.cfgtmpvarsi.fd = fd
-	return fd
+	v2rayJsonWithComment := &v2rayJsonWithComment.Reader{Reader: fd}
+	return v2rayJsonWithComment
 }
 func (v *V2RayPoint) parseCfgDone() {
 	if v.cfgtmpvarsi.fd != nil {
