@@ -16,7 +16,18 @@ type vpnProtectedDialer struct {
 
 func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, error) {
 	if strings.HasPrefix(network, "tcp") {
-		addr, err := net.ResolveTCPAddr(network, Address)
+
+		var addr *net.TCPAddr
+		var err error
+
+		addr, haveaddr := sDialer.vp.prepareddomain.tcpprepared[Address]
+
+		if haveaddr == false {
+			addr, err = net.ResolveTCPAddr(network, Address)
+		} else {
+			log.Println("Using Prepared Domain Name: TCP,", Address)
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +62,17 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 
 	if strings.HasPrefix(network, "udp") {
 
-		addr, err := net.ResolveUDPAddr(network, Address)
+		var addr *net.UDPAddr
+		var err error
+
+		addr, haveaddr := sDialer.vp.prepareddomain.udpprepared[Address]
+
+		if haveaddr == false {
+			addr, err = net.ResolveUDPAddr(network, Address)
+		} else {
+			log.Println("Using Prepared Domain Name: UDP,", Address)
+		}
+
 		if err != nil {
 			return nil, err
 		}

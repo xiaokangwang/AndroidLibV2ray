@@ -16,6 +16,7 @@ type libv2rayconf struct {
 	esco          []libv2rayconfEscortTarget
 	rend          []libv2rayconfRenderCfgTarget
 	vpnConfig     vpnserviceConfig
+	dnsloopfix    vpnserviceDnsloopFix
 }
 
 type libv2rayconfEscortTarget struct {
@@ -110,6 +111,21 @@ func (v *V2RayPoint) parseConf() error {
 			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config vpnConfigX")
 			log.Println(err, "Failed Type Assert: Config vpnConfigX")
 			return errors.New("Failed Type Assert: Config vpnConfigX")
+		}
+	}
+
+	vpndnsloopFix, exist := libconf.CheckGet("preparedDomainName")
+	if exist {
+		vpndnsloopFixJ, ok := vpndnsloopFix.MarshalJSON()
+		if ok != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config vpndnsloopFixJ")
+			return errors.New("Failed Type Assert: Config vpndnsloopFixJ")
+		}
+		err := json.Unmarshal(vpndnsloopFixJ, &v.conf.dnsloopfix)
+		if err != nil {
+			v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config vpndnsloopFixJ")
+			log.Println(err, "Failed Type Assert: Config vpndnsloopFixJ")
+			return errors.New("Failed Type Assert: Config vpndnsloopFixJ")
 		}
 	}
 

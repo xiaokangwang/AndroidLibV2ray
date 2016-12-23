@@ -28,6 +28,8 @@ func (v *V2RayPoint) askSupportSetInit() {
 func (v *V2RayPoint) vpnSetup() {
 	log.Println(v.conf.vpnConfig.VPNSetupArg)
 	if v.conf.vpnConfig.VPNSetupArg != "" {
+		v.prepareDomainName()
+
 		v.askSupportSetInit()
 	}
 }

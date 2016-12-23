@@ -31,6 +31,8 @@ type V2RayPoint struct {
 	VpnSupportnodup      bool
 	PackageName          string
 	cfgtmpvarsi          cfgtmpvars
+	//softcrashMonitor     bool
+	prepareddomain preparedDomain
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -40,6 +42,8 @@ type V2RayCallbacks interface {
 }
 
 func (v *V2RayPoint) pointloop() {
+	//v.setupSoftCrashMonitor()
+
 	v.VpnSupportnodup = false
 
 	if v.parseConf() != nil {
