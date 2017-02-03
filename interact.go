@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"v2ray.com/core"
-	"v2ray.com/core/common/log"
+	"v2ray.com/core/app/log"
 
 	// For json config parser
 	_ "v2ray.com/core/tools/conf"
