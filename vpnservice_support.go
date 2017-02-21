@@ -9,6 +9,7 @@ import (
 
 	"golang.org/x/sys/unix"
 )
+import "github.com/davecgh/go-spew/spew"
 
 type vpnProtectedDialer struct {
 	vp *V2RayPoint
@@ -41,6 +42,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		sDialer.vp.VpnSupportSet.Protect(fd)
 
 		sa := new(unix.SockaddrInet6)
+		spew.Dump(addr, sDialer.vp.prepareddomain.tcpprepared)
 		sa.Port = addr.Port
 		sa.ZoneId = uint32(zoneToInt(addr.Zone))
 		//fmt.Println(addr.IP.To16())

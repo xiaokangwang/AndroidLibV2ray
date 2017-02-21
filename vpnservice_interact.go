@@ -2,6 +2,8 @@ package libv2ray
 
 import (
 	"log"
+	"sync/atomic"
+	"time"
 
 	"golang.org/x/sys/unix"
 
@@ -12,6 +14,12 @@ import (
 func (v *V2RayPoint) VpnSupportReady() {
 	if !v.VpnSupportnodup {
 		v.VpnSupportnodup = true
+		//Surpress Network Interruption Notifiction
+		atomic.StoreInt64(&v.interuptDeferto, 1)
+		go func() {
+			time.Sleep(5 * time.Second)
+			atomic.StoreInt64(&v.interuptDeferto, 0)
+		}()
 		v.VpnSupportSet.Setup(v.conf.vpnConfig.VPNSetupArg)
 		v.setV2RayDialer()
 		v.startVPNRequire()
