@@ -25,7 +25,7 @@ type V2RayPoint struct {
 	ConfigureFile        string
 	ConfigureFileContent string
 	Callbacks            V2RayCallbacks
-	vpoint               *core.Point
+	vpoint               core.Server
 	IsRunning            bool
 	conf                 *libv2rayconf
 	escortProcess        *[](*os.Process)
@@ -78,7 +78,7 @@ func (v *V2RayPoint) pointloop() {
 		return
 	}
 
-	vPoint, err := core.NewPoint(config)
+	vPoint, err := core.New(config)
 	if err != nil {
 		log.Error("Failed to create Point server: ", err)
 
