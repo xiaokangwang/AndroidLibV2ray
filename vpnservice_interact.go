@@ -54,5 +54,5 @@ func (v *V2RayPoint) vpnShutdown() {
 
 func (v *V2RayPoint) setV2RayDialer() {
 	protectedDialer := &vpnProtectedDialer{vp: v}
-	internet.SubstituteDialer(protectedDialer)
+	internet.UseAlternativeSystemDialer(internet.WithAdapter(protectedDialer))
 }
