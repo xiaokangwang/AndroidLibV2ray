@@ -66,9 +66,6 @@ func (v *V2RayPoint) pointloop() {
 	log.Info("v.renderAll() ")
 	v.renderAll()
 
-	//Surpress Network Interruption Notifiction
-	atomic.StoreInt64(&v.interuptDeferto, 1)
-
 	config, err := core.LoadConfig(core.ConfigFormat_JSON, v.parseCfg())
 	if err != nil {
 		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)

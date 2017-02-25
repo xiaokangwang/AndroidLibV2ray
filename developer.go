@@ -8,3 +8,7 @@ func (v *V2RayPoint) isDebugTriggered() bool {
 	}
 	return true
 }
+
+func (v *V2RayPoint) IsDebugTriggered() bool {
+	return v.isDebugTriggered()
+}
