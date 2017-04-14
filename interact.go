@@ -8,6 +8,7 @@ import (
 
 	"v2ray.com/core"
 	"v2ray.com/core/app/log"
+	"v2ray.com/core/common/errors"
 
 	// For json config parser
 	_ "v2ray.com/core/tools/conf"
@@ -58,17 +59,16 @@ func (v *V2RayPoint) pointloop() {
 	err := v.checkIfRcExist()
 
 	if err != nil {
-		log.Error("Failed to copy asset", err)
+		log.Trace(errors.New("Failed to copy asset").Base(err).AtError())
 		v.Callbacks.OnEmitStatus(-1, "Failed to copy asset ("+err.Error()+")")
-
 	}
 
-	log.Info("v.renderAll() ")
+	log.Trace(errors.New("v.renderAll()"))
 	v.renderAll()
 
 	config, err := core.LoadConfig(core.ConfigFormat_JSON, v.parseCfg())
 	if err != nil {
-		log.Error("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile, err)
+		log.Trace(errors.New("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile).Base(err).AtError())
 
 		v.Callbacks.OnEmitStatus(-1, "Failed to read config file ("+v.ConfigureFile+")")
 
@@ -77,28 +77,28 @@ func (v *V2RayPoint) pointloop() {
 
 	vPoint, err := core.New(config)
 	if err != nil {
-		log.Error("Failed to create Point server: ", err)
+		log.Trace(errors.New("Failed to create Point server").Base(err))
 
 		v.Callbacks.OnEmitStatus(-1, "Failed to create Point server ("+err.Error()+")")
 
 		return
 	}
 	v.IsRunning = true
-	log.Info("vPoint.Start() ")
+	log.Trace(errors.New("vPoint.Start()"))
 	vPoint.Start()
 	v.vpoint = vPoint
 
-	log.Info("v.escortingUP() ")
+	log.Trace(errors.New("v.escortingUP()"))
 	v.escortingUP()
 
 	v.vpnSetup()
 
 	if v.conf != nil {
 		env := v.conf.additionalEnv
-		log.Info("Exec Upscript() ")
+		log.Trace(errors.New("Exec Upscript()"))
 		err = v.runbash(v.conf.upscript, env)
 		if err != nil {
-			log.Error("OnUp failed to exec: ", err)
+			log.Trace(errors.New("OnUp failed to exec").Base(err))
 		}
 	}
 
@@ -122,13 +122,13 @@ func (v *V2RayPoint) stopLoopW() {
 
 	if v.conf != nil {
 		env := v.conf.additionalEnv
-		log.Info("Running downscript")
+		log.Trace(errors.New("Running downscript"))
 		err := v.runbash(v.conf.downscript, env)
 
 		if err != nil {
-			log.Error("OnDown failed to exec: ", err)
+			log.Trace(errors.New("OnDown failed to exec").Base(err))
 		}
-		log.Info("v.escortingDown() ")
+		log.Trace(errors.New("v.escortingDown()"))
 		v.escortingDown()
 	}
 
@@ -164,19 +164,19 @@ func (v *V2RayPoint) NetworkInterrupted() {
 	go func() {
 		if v.IsRunning {
 			//Calc sleep time
-			log.Info("Running+NetworkInterrupted")
+			log.Trace(errors.New("Running+NetworkInterrupted"))
 			succ := atomic.CompareAndSwapInt64(&v.interuptDeferto, 0, 1)
 			if succ {
-				log.Info("Entered+NetworkInterrupted")
+				log.Trace(errors.New("Entered+NetworkInterrupted"))
 				v.vpoint.Close()
-				log.Info("Closed+NetworkInterrupted")
+				log.Trace(errors.New("Closed+NetworkInterrupted"))
 				time.Sleep(3 * time.Second)
-				log.Info("SleepDone+NetworkInterrupted")
+				log.Trace(errors.New("SleepDone+NetworkInterrupted"))
 				v.vpoint.Start()
-				log.Info("Started+NetworkInterrupted")
+				log.Trace(errors.New("Started+NetworkInterrupted"))
 				atomic.StoreInt64(&v.interuptDeferto, 0)
 			} else {
-				log.Info("Skipped+NetworkInterrupted")
+				log.Trace(errors.New("Skipped+NetworkInterrupted"))
 			}
 		}
 	}()
