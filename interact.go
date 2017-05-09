@@ -10,8 +10,7 @@ import (
 	"v2ray.com/core/app/log"
 	"v2ray.com/core/common/errors"
 
-	// For json config parser
-	_ "v2ray.com/core/tools/conf"
+	v2rayconf "v2ray.com/ext/tools/conf/serial"
 )
 
 /*V2RayPoint V2Ray Point Server
@@ -66,7 +65,7 @@ func (v *V2RayPoint) pointloop() {
 	log.Trace(errors.New("v.renderAll()"))
 	v.renderAll()
 
-	config, err := core.LoadConfig(core.ConfigFormat_JSON, v.parseCfg())
+	config, err := v2rayconf.LoadJSONConfig(v.parseCfg())
 	if err != nil {
 		log.Trace(errors.New("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile).Base(err).AtError())
 
