@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	v2rayJsonWithComment "v2ray.com/core/tools/conf/json"
+	v2rayJsonWithComment "v2ray.com/ext/encoding/json"
 )
 
 type cfgtmpvars struct {
