@@ -16,7 +16,7 @@ func (sc *StatControler) CollectInterfaceInfo() error {
 	if err != nil {
 		return err
 	}
-	d, err := ioutil.ReadAll(f)
+	d, _ := ioutil.ReadAll(f)
 	s := strings.Split(strings.TrimSpace(string(d)), "\n")
 	for _, scc := range s {
 		subsc := strings.Split(strings.TrimSpace(scc), " ")
