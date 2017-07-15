@@ -1,6 +1,7 @@
 package libv2ray
 
 import (
+	"io/ioutil"
 	"os"
 	"path"
 )
@@ -11,6 +12,8 @@ func NewLib2rayContext() *V2RayContext {
 
 type V2RayContext struct {
 	configureFile string
+	Callbacks     *V2RayContextCallbacks
+	PackageName   string
 }
 
 func (vc *V2RayContext) CheckConfigureFile() bool {
@@ -50,4 +53,35 @@ func (vc *V2RayContext) AssignConfigureFile(cf string) {
 
 func (vc *V2RayContext) GetConfigureFile() string {
 	return vc.configureFile
+}
+
+type V2RayContextCallbacks interface {
+	OnRefreshNeeded()
+}
+
+func (vc *V2RayContext) ReadProp(name string) (string, error) {
+	os.MkdirAll(vc.getDataDir()+"config", 0700)
+	fd, err := os.Open(vc.getDataDir() + "config/" + name)
+	if err != nil {
+		return "", err
+	}
+	content, err := ioutil.ReadAll(fd)
+	if err != nil {
+		return "", err
+	}
+	fd.Close()
+	return string(content), nil
+}
+
+func (vc *V2RayContext) WriteProp(name string, cont string) error {
+	os.MkdirAll(vc.getDataDir()+"config", 0700)
+	return ioutil.WriteFile(vc.getDataDir()+"config/"+name, []byte(cont), 0600)
+}
+
+func (v *V2RayContext) getDataDir() string {
+	var datadir = "/data/data/org.kkdev.v2raygo/"
+	if v.PackageName != "" {
+		datadir = "/data/data/" + v.PackageName + "/"
+	}
+	return datadir
 }
