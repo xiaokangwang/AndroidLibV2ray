@@ -35,7 +35,7 @@ func exists(path string) bool {
 	return false
 }
 
-func (vc *V2RayContext) ListConfigureFileDir() []string {
+func (vc *V2RayContext) ListConfigureFileDir() *StringArrayList {
 	dir := path.Dir(vc.configureFile)
 	dfd, err := os.Open(dir)
 	if err != nil {
@@ -45,8 +45,14 @@ func (vc *V2RayContext) ListConfigureFileDir() []string {
 	if err != nil {
 		return nil
 	}
-	return d
+	return &StringArrayList{list: d}
 }
+
+func (vc *V2RayContext) GetBriefDesc(pathn string) string {
+	_, ret := path.Split(pathn)
+	return ret
+}
+
 func (vc *V2RayContext) AssignConfigureFile(cf string) {
 	vc.configureFile = cf
 }
