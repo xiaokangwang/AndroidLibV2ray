@@ -42,8 +42,18 @@ func (v *V2RayPoint) vpnSetup() {
 func (v *V2RayPoint) vpnShutdown() {
 
 	if v.conf.vpnConfig.VPNSetupArg != "" {
+		println("VPN SHUTDOWN", v.VpnSupportnodup)
+		/*
+			BUG DISCOVERED!
+
+			v.VpnSupportnodup can have unexpected value cause VPN failed to revoke.
+			more testing needed.
+
+		*/
+
 		if v.VpnSupportnodup {
-			unix.Close(v.VpnSupportSet.GetVPNFd())
+			err := unix.Close(v.VpnSupportSet.GetVPNFd())
+			println(err)
 		}
 		v.VpnSupportSet.Shutdown()
 	}

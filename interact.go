@@ -38,6 +38,7 @@ type V2RayPoint struct {
 	prepareddomain  preparedDomain
 	v2rayOP         *sync.Mutex
 	interuptDeferto int64
+	Context         *V2RayContext
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -179,4 +180,14 @@ func (v *V2RayPoint) NetworkInterrupted() {
 			}
 		}
 	}()
+}
+
+/*
+Client can opt-in V2Ray's Next Generation Interface
+*/
+func (v *V2RayPoint) UpgradeToContext() {
+	if v.Context == nil {
+		v.Context = new(V2RayContext)
+	}
+
 }

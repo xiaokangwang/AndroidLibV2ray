@@ -13,6 +13,12 @@ type cfgtmpvars struct {
 }
 
 func (v *V2RayPoint) parseCfg() io.Reader {
+	//Use Context if possible
+
+	if v.Context != nil {
+		v.ConfigureFile, _ = v.Context.ReadProp(configureFile)
+	}
+
 	if v.ConfigureFile == "V2Ray_internal/ConfigureFileContent" {
 		return strings.NewReader(v.ConfigureFileContent)
 	}
