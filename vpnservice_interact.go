@@ -2,7 +2,6 @@ package libv2ray
 
 import (
 	"log"
-	"time"
 
 	"golang.org/x/sys/unix"
 
@@ -12,12 +11,13 @@ import (
 /*VpnSupportReady VpnSupportReady*/
 func (v *V2RayPoint) VpnSupportReady() {
 	if !v.VpnSupportnodup {
-		v.VpnSupportnodup = true
-		//Surpress Network Interruption Notifiction
-		go func() {
-			time.Sleep(5 * time.Second)
-			v.VpnSupportnodup = false
-		}()
+		/*
+			v.VpnSupportnodup = true
+			//Surpress Network Interruption Notifiction
+			go func() {
+				time.Sleep(5 * time.Second)
+				v.VpnSupportnodup = false
+			}()*/
 		v.VpnSupportSet.Setup(v.conf.vpnConfig.VPNSetupArg)
 		v.setV2RayDialer()
 		v.startVPNRequire()
@@ -51,10 +51,10 @@ func (v *V2RayPoint) vpnShutdown() {
 
 		*/
 
-		if v.VpnSupportnodup {
-			err := unix.Close(v.VpnSupportSet.GetVPNFd())
-			println(err)
-		}
+		//if v.VpnSupportnodup {
+		err := unix.Close(v.VpnSupportSet.GetVPNFd())
+		println(err)
+		//}
 		v.VpnSupportSet.Shutdown()
 	}
 	v.VpnSupportnodup = false
