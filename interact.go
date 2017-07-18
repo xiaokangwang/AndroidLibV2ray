@@ -91,6 +91,15 @@ func (v *V2RayPoint) pointloop() {
 	log.Trace(errors.New("v.escortingUP()"))
 	v.escortingUP()
 
+	//Now, surpress interrupt signal for 5 sec
+
+	v.interuptDeferto = 1
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		v.interuptDeferto = 0
+	}()
+
 	v.vpnSetup()
 
 	if v.conf != nil {
@@ -170,7 +179,7 @@ func (v *V2RayPoint) NetworkInterrupted() {
 				log.Trace(errors.New("Entered+NetworkInterrupted"))
 				v.vpoint.Close()
 				log.Trace(errors.New("Closed+NetworkInterrupted"))
-				time.Sleep(3 * time.Second)
+				time.Sleep(2 * time.Second)
 				log.Trace(errors.New("SleepDone+NetworkInterrupted"))
 				v.vpoint.Start()
 				log.Trace(errors.New("Started+NetworkInterrupted"))
