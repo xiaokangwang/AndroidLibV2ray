@@ -16,6 +16,9 @@ func (v *V2RayPoint) addEnvironment(env []string) []string {
 }
 
 func (v *V2RayPoint) getEnvironment() []string {
+	if v.conf == nil {
+		return v.addEnvironment(make([]string, 0))
+	}
 	env := v.conf.additionalEnv
 	env = v.addEnvironment(env)
 	return env

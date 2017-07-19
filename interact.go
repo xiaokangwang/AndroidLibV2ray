@@ -1,6 +1,7 @@
 package libv2ray
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"sync/atomic"
@@ -173,6 +174,11 @@ func (v *V2RayPoint) NetworkInterrupted() {
 	go func() {
 		if v.IsRunning {
 			//Calc sleep time
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("Your device might not support atomic operation", r)
+				}
+			}()
 			log.Trace(errors.New("Running+NetworkInterrupted"))
 			succ := atomic.CompareAndSwapInt64(&v.interuptDeferto, 0, 1)
 			if succ {
