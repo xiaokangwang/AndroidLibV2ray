@@ -119,3 +119,12 @@ func (v *V2RayContext) getDataDir() string {
 	}
 	return datadir
 }
+
+func (vc *V2RayContext) ScanQR() *QRScanContext {
+	if CurrentScan != nil {
+		return CurrentScan
+	}
+	ret := &QRScanContext{vctx: vc}
+	ret.Init()
+	return ret
+}
