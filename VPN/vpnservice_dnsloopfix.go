@@ -7,12 +7,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-type vpnserviceDnsloopFix struct {
-	DomainNameList []string `json:"domainName"`
-	TCPVersion     string   `json:"tcpVersion"`
-	UDPVersion     string   `json:"udpVersion"`
-}
-
 type preparedDomain struct {
 	tcpprepared map[string](*net.TCPAddr)
 	udpprepared map[string](*net.UDPAddr)

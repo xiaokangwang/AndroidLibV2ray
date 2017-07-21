@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package kkdev.v2ray.LibV2Ray;
+option go_package = "configure";
+
+
+import "LibV2Ray.proto";
+
+message V2RaySharedConf{
+reserved 1 to 5;
+LibV2RayConf SharpLibV2Ray = 12;
+}

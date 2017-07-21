@@ -7,15 +7,15 @@ import (
 	"strings"
 )
 
-func (v *V2RayPoint) addEnvironment(env []string) []string {
-	datadir := v.getDataDir()
+func (v *jsonToPbConverter) addEnvironment(env []string) []string {
+	datadir := v.Datadir
 	env = append(env, "proxyuid="+strconv.Itoa(os.Getuid()))
 	env = append(env, "datadir="+datadir)
-	env = append(env, "cfgdir="+filepath.Dir(v.ConfigureFile)+"")
+	env = append(env, "cfgdir="+filepath.Dir(v.Cfgfile)+"")
 	return env
 }
 
-func (v *V2RayPoint) getEnvironment() []string {
+func (v *jsonToPbConverter) getEnvironment() []string {
 	if v.conf == nil {
 		return v.addEnvironment(make([]string, 0))
 	}

@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func (v *V2RayPoint) renderAll() {
+func (v *jsonToPbConverter) renderAll() {
 	v.renderesco()
 	v.renderptm()
 	v.rendervpn()
 }
 
-func (v *V2RayPoint) renderptm() {
+func (v *jsonToPbConverter) renderptm() {
 	envr0 := envToMap(v.getEnvironment())
 	mf0 := func(lookup string) string {
 		if envl0, ok := envr0[lookup]; ok {
@@ -57,7 +57,7 @@ func (v *V2RayPoint) renderptm() {
 		}
 	}
 }
-func (v *V2RayPoint) renderesco() {
+func (v *jsonToPbConverter) renderesco() {
 	envr := envToMap(v.getEnvironment())
 	for key := range v.conf.esco {
 		mf := func(lookup string) string {
@@ -73,7 +73,7 @@ func (v *V2RayPoint) renderesco() {
 	}
 }
 
-func (v *V2RayPoint) rendervpn() {
+func (v *jsonToPbConverter) rendervpn() {
 	envr := envToMap(v.getEnvironment())
 	mf := func(lookup string) string {
 		if envl, ok := envr[lookup]; ok {

@@ -13,6 +13,7 @@ import (
 
 	v2rayconf "v2ray.com/ext/tools/conf/serial"
 )
+import "github.com/xiaokangwang/AndroidLibV2ray/configure"
 
 /*V2RayPoint V2Ray Point Server
 This is territory of Go, so no getter and setters!
@@ -28,13 +29,14 @@ type V2RayPoint struct {
 	Callbacks            V2RayCallbacks
 	vpoint               core.Server
 	IsRunning            bool
-	conf                 *libv2rayconf
-	escortProcess        *[](*os.Process)
-	unforgivnesschan     chan int
-	VpnSupportSet        V2RayVPNServiceSupportsSet
-	VpnSupportnodup      bool
-	PackageName          string
-	cfgtmpvarsi          cfgtmpvars
+	//conf                 *libv2rayconf
+	confng           *configure.LibV2RayConf
+	escortProcess    *[](*os.Process)
+	unforgivnesschan chan int
+	VpnSupportSet    V2RayVPNServiceSupportsSet
+	VpnSupportnodup  bool
+	PackageName      string
+	cfgtmpvarsi      cfgtmpvars
 	//softcrashMonitor     bool
 	prepareddomain  preparedDomain
 	v2rayOP         *sync.Mutex

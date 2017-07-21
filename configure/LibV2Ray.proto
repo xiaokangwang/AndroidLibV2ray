@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package kkdev.v2ray.LibV2Ray;
+option go_package = "configure";
+
+
+message VPNServiceConfig{
+  string Target = 1;
+  repeated string Args = 2;
+  string VPNSetupArg = 3;
+}
+
+message DNSLoopFix{
+  string TCPVersion = 1;
+  string UDPVersion = 2;
+  repeated string DomainNameList = 3;
+}
+
+message VPNConfig{
+VPNServiceConfig Service = 1;
+DNSLoopFix PreparedDomainName=2;
+}
+
+message EscortedProcess{
+  string Target = 1;
+  repeated string Args = 2;
+  bool Forgiveable = 3;
+}
+
+message UpDownScripts{
+  string UpScript = 1;
+  string DownScript = 2;
+}
+
+message RootModeConfig {
+  repeated EscortedProcess Escorting = 1;
+  UpDownScripts Scripts = 2;
+}
+message EnvironmentVar {
+  repeated map<string, string> Vars = 3;
+}
+
+message LibV2RayConf {
+//If this is false, no other options will be readed
+ bool NoAutoConvert = 1;
+
+ VPNConfig VpnConf = 1000;
+ RootModeConfig RootModeConf = 1001;
+
+}
