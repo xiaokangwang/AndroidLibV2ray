@@ -30,13 +30,16 @@ func (qs *QRScanContext) OnNewScanResult(data string, allowdiscard bool) string 
 	}
 	//First try if it is a legacy schema
 	ok, ext, fb := libV2RayAuxiliaryURL.TryRender(data)
-	if ok && fb != nil && !qs.surpressFinish {
+	fmt.Println(qs.surpressFinish)
+	if ok && fb != nil {
 		//Decode ready
 		qs.legencyScanned = true
 		qs.legencyScannedExt = ext
 		qs.legencyScannedCtx = fb
-		qs.surpressFinish = true
-		qs.ScanReporter.ReadyToFinish()
+		if !qs.surpressFinish {
+			qs.surpressFinish = true
+			qs.ScanReporter.ReadyToFinish()
+		}
 		return "Legacy Scanned"
 	}
 	res := qs.ec.V2RayURLToByte(data)
