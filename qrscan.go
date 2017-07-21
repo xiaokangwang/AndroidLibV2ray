@@ -7,22 +7,35 @@ import (
 	"strings"
 
 	vlencoding "github.com/xiaokangwang/V2RayConfigureFileUtil/encoding"
+	"github.com/xiaokangwang/libV2RayAuxiliaryURL"
 )
 
 var CurrentScan *QRScanContext
 
 type QRScanContext struct {
-	ec             *vlencoding.Encoder
-	qd             *vlencoding.QRDecoder
-	ScanReporter   QRScanReport
-	vctx           *V2RayContext
-	surpressFinish bool
+	ec                *vlencoding.Encoder
+	qd                *vlencoding.QRDecoder
+	ScanReporter      QRScanReport
+	vctx              *V2RayContext
+	surpressFinish    bool
+	legencyScanned    bool
+	legencyScannedExt string
+	legencyScannedCtx []byte
 }
 
 func (qs *QRScanContext) OnNewScanResult(data string, allowdiscard bool) string {
 	if qs.qd == nil {
 		qs.qd = qs.ec.StartQRDecode()
 		qs.surpressFinish = false
+	}
+	//First try if it is a legency schema
+	ok, ext, fb := libV2RayAuxiliaryURL.TryRender(data)
+	if ok && fb != nil {
+		//Decode ready
+		qs.legencyScanned = true
+		qs.legencyScannedExt = ext
+		qs.legencyScannedCtx = fb
+		qs.ScanReporter.ReadyToFinish()
 	}
 	res := qs.ec.V2RayURLToByte(data)
 	if res == nil {
@@ -57,6 +70,17 @@ type QRScanReport interface {
 }
 
 func (qs *QRScanContext) Finish(name string) bool {
+	//do we just scanned a legency schema
+	if qs.legencyScanned {
+		fdr := filepath.Dir(qs.vctx.GetConfigureFile())
+		err := ioutil.WriteFile(fmt.Sprintf("%v/%v%v", fdr, name, qs.legencyScannedExt), qs.legencyScannedCtx, 0600)
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		qs.legencyScanned = false
+		qs.Discard()
+	}
 	if !qs.qd.IsDecodeReady() {
 		fmt.Println("Called decoder when decode not ready")
 		return false
