@@ -113,3 +113,12 @@ func (qs *QRScanContext) Finish(name string) bool {
 func (qs *QRScanContext) Discard() {
 	qs.qd = nil
 }
+
+func (vc *V2RayContext) ScanQR() *QRScanContext {
+	if CurrentScan != nil {
+		return CurrentScan
+	}
+	ret := &QRScanContext{vctx: vc}
+	ret.Init()
+	return ret
+}
