@@ -6,6 +6,8 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
 )
 
 func NewLib2rayContext() *V2RayContext {
@@ -16,6 +18,7 @@ type V2RayContext struct {
 	configureFile string
 	Callbacks     V2RayContextCallbacks
 	PackageName   string
+	Status        CoreI.Status
 }
 
 const configureFile = "ConfigureFile"
@@ -94,8 +97,8 @@ type V2RayContextCallbacks interface {
 }
 
 func (vc *V2RayContext) ReadProp(name string) (string, error) {
-	os.MkdirAll(vc.getDataDir()+"config", 0700)
-	fd, err := os.Open(vc.getDataDir() + "config/" + name)
+	os.MkdirAll(vc.Status.GetDataDir()+"config", 0700)
+	fd, err := os.Open(vc.Status.GetDataDir() + "config/" + name)
 	if err != nil {
 		return "", err
 	}
@@ -108,14 +111,6 @@ func (vc *V2RayContext) ReadProp(name string) (string, error) {
 }
 
 func (vc *V2RayContext) WriteProp(name string, cont string) error {
-	os.MkdirAll(vc.getDataDir()+"config", 0700)
-	return ioutil.WriteFile(vc.getDataDir()+"config/"+name, []byte(cont), 0600)
-}
-
-func (v *V2RayContext) getDataDir() string {
-	var datadir = "/data/data/org.kkdev.v2raygo/"
-	if v.PackageName != "" {
-		datadir = "/data/data/" + v.PackageName + "/"
-	}
-	return datadir
+	os.MkdirAll(vc.Status.GetDataDir()+"config", 0700)
+	return ioutil.WriteFile(vc.Status.GetDataDir()+"config/"+name, []byte(cont), 0600)
 }

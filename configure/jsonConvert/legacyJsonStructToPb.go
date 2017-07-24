@@ -1,6 +1,10 @@
-package libv2ray
+package jsonConvert
 
-import "github.com/xiaokangwang/AndroidLibV2ray/configure"
+import (
+	"strings"
+
+	"github.com/xiaokangwang/AndroidLibV2ray/configure"
+)
 
 func ConvertToPb(leagcy libv2rayconf) *configure.LibV2RayConf {
 	NextGenerationProtobufConfigureStruct := &configure.LibV2RayConf{}
@@ -25,5 +29,17 @@ func ConvertToPb(leagcy libv2rayconf) *configure.LibV2RayConf {
 	NextGenerationProtobufConfigureStruct.VpnConf.PreparedDomainName.TCPVersion = leagcy.dnsloopfix.TCPVersion
 	NextGenerationProtobufConfigureStruct.VpnConf.PreparedDomainName.UDPVersion = leagcy.dnsloopfix.UDPVersion
 	NextGenerationProtobufConfigureStruct.VpnConf.PreparedDomainName.DomainNameList = leagcy.dnsloopfix.DomainNameList
+	NextGenerationProtobufConfigureStruct.Env = &configure.EnvironmentVar{}
+	NextGenerationProtobufConfigureStruct.Env.Vars = envToMap(leagcy.additionalEnv)
 	return NextGenerationProtobufConfigureStruct
+}
+
+func envToMap(k []string) map[string]string {
+	var themap map[string]string
+	themap = make(map[string]string)
+	for _, val := range k {
+		r := strings.Index(val, "=")
+		themap[val[:r]] = val[r+1:]
+	}
+	return themap
 }

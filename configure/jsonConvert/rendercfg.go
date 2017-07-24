@@ -1,4 +1,4 @@
-package libv2ray
+package jsonConvert
 
 import (
 	"io"
@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/xiaokangwang/AndroidLibV2ray/Process"
 )
 
 func (v *jsonToPbConverter) renderAll() {
@@ -15,7 +17,8 @@ func (v *jsonToPbConverter) renderAll() {
 }
 
 func (v *jsonToPbConverter) renderptm() {
-	envr0 := envToMap(v.getEnvironment())
+	Eg := &Process.EnvironmentCreater{Conf: v.Env}
+	envr0 := envToMap(Eg.GetEnvironment())
 	mf0 := func(lookup string) string {
 		if envl0, ok := envr0[lookup]; ok {
 			return envl0
@@ -27,7 +30,7 @@ func (v *jsonToPbConverter) renderptm() {
 			r.Args[key2] = os.Expand(r.Args[key2], mf0)
 		}
 		mf := func(lookup string) string {
-			envr := envToMap(append(v.getEnvironment(), r.Args...))
+			envr := envToMap(append(Eg.GetEnvironment(), r.Args...))
 			if envl, ok := envr[lookup]; ok {
 				return envl
 			}
@@ -58,7 +61,8 @@ func (v *jsonToPbConverter) renderptm() {
 	}
 }
 func (v *jsonToPbConverter) renderesco() {
-	envr := envToMap(v.getEnvironment())
+	Eg := &Process.EnvironmentCreater{Conf: v.Env}
+	envr := envToMap(Eg.GetEnvironment())
 	for key := range v.conf.esco {
 		mf := func(lookup string) string {
 			if envl, ok := envr[lookup]; ok {
@@ -74,7 +78,8 @@ func (v *jsonToPbConverter) renderesco() {
 }
 
 func (v *jsonToPbConverter) rendervpn() {
-	envr := envToMap(v.getEnvironment())
+	Eg := &Process.EnvironmentCreater{Conf: v.Env}
+	envr := envToMap(Eg.GetEnvironment())
 	mf := func(lookup string) string {
 		if envl, ok := envr[lookup]; ok {
 			return envl

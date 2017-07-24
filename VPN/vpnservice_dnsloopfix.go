@@ -1,4 +1,4 @@
-package libv2ray
+package VPN
 
 import (
 	"log"
@@ -12,20 +12,20 @@ type preparedDomain struct {
 	udpprepared map[string](*net.UDPAddr)
 }
 
-func (v *V2RayPoint) prepareDomainName() {
-	if v.conf == nil {
+func (v *VPNSupport) prepareDomainName() {
+	if v.VpnSupportSet == nil {
 		return
 	}
 	v.prepareddomain.tcpprepared = make(map[string](*net.TCPAddr))
 	v.prepareddomain.udpprepared = make(map[string](*net.UDPAddr))
-	for _, domainName := range v.conf.dnsloopfix.DomainNameList {
+	for _, domainName := range v.Conf.PreparedDomainName.DomainNameList {
 		log.Println("Preparing DNS,", domainName)
 		var err error
-		v.prepareddomain.tcpprepared[domainName], err = net.ResolveTCPAddr(v.conf.dnsloopfix.TCPVersion, domainName)
+		v.prepareddomain.tcpprepared[domainName], err = net.ResolveTCPAddr(v.Conf.PreparedDomainName.TCPVersion, domainName)
 		if err != nil {
 			log.Println(err)
 		}
-		v.prepareddomain.udpprepared[domainName], err = net.ResolveUDPAddr(v.conf.dnsloopfix.UDPVersion, domainName)
+		v.prepareddomain.udpprepared[domainName], err = net.ResolveUDPAddr(v.Conf.PreparedDomainName.UDPVersion, domainName)
 		spew.Dump(v.prepareddomain.udpprepared[domainName])
 		if err != nil {
 			log.Println(err)

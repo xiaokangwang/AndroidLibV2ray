@@ -37,7 +37,7 @@ message RootModeConfig {
   UpDownScripts Scripts = 2;
 }
 message EnvironmentVar {
-  repeated map<string, string> Vars = 3;
+  map<string, string> Vars = 3;
 }
 
 message LibV2RayConf {
@@ -46,5 +46,5 @@ message LibV2RayConf {
 
  VPNConfig VpnConf = 1000;
  RootModeConfig RootModeConf = 1001;
-
+ EnvironmentVar Env = 1002;
 }

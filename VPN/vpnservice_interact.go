@@ -1,7 +1,9 @@
-package libv2ray
+package VPN
 
 import (
-	"log"
+	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
+	"github.com/xiaokangwang/AndroidLibV2ray/Process/Escort"
+	"github.com/xiaokangwang/AndroidLibV2ray/configure"
 
 	"golang.org/x/sys/unix"
 
@@ -9,8 +11,8 @@ import (
 )
 
 /*VpnSupportReady VpnSupportReady*/
-func (v *V2RayPoint) VpnSupportReady() {
-	if !v.VpnSupportnodup {
+func (v *VPNSupport) VpnSupportReady() {
+	if !v.status.VpnSupportnodup {
 		/*
 			v.VpnSupportnodup = true
 			//Surpress Network Interruption Notifiction
@@ -18,31 +20,30 @@ func (v *V2RayPoint) VpnSupportReady() {
 				time.Sleep(5 * time.Second)
 				v.VpnSupportnodup = false
 			}()*/
-		v.VpnSupportSet.Setup(v.conf.vpnConfig.VPNSetupArg)
+		v.VpnSupportSet.Setup(v.Conf.Service.VPNSetupArg)
 		v.setV2RayDialer()
 		v.startVPNRequire()
 	}
 }
-func (v *V2RayPoint) startVPNRequire() {
-	go v.escortRun(v.conf.vpnConfig.Target, v.conf.vpnConfig.Args, false, v.VpnSupportSet.GetVPNFd())
+func (v *VPNSupport) startVPNRequire() {
+	e := Escort.NewEscort()
+	go e.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())
 }
 
-func (v *V2RayPoint) askSupportSetInit() {
+func (v *VPNSupport) askSupportSetInit() {
 	v.VpnSupportSet.Prepare()
 }
 
-func (v *V2RayPoint) vpnSetup() {
-	log.Println(v.conf.vpnConfig.VPNSetupArg)
-	if v.conf.vpnConfig.VPNSetupArg != "" {
+func (v *VPNSupport) vpnSetup() {
+	if v.Conf.Service.VPNSetupArg != "" {
 		v.prepareDomainName()
 
 		v.askSupportSetInit()
 	}
 }
-func (v *V2RayPoint) vpnShutdown() {
+func (v *VPNSupport) vpnShutdown() {
 
-	if v.conf.vpnConfig.VPNSetupArg != "" {
-		println("VPN SHUTDOWN", v.VpnSupportnodup)
+	if v.Conf.Service.VPNSetupArg != "" {
 		/*
 			BUG DISCOVERED!
 
@@ -57,10 +58,25 @@ func (v *V2RayPoint) vpnShutdown() {
 		//}
 		v.VpnSupportSet.Shutdown()
 	}
-	v.VpnSupportnodup = false
+	v.status.VpnSupportnodup = false
 }
 
-func (v *V2RayPoint) setV2RayDialer() {
+func (v *VPNSupport) setV2RayDialer() {
 	protectedDialer := &vpnProtectedDialer{vp: v}
 	internet.UseAlternativeSystemDialer(internet.WithAdapter(protectedDialer))
+}
+
+type VPNSupport struct {
+	prepareddomain preparedDomain
+	VpnSupportSet  V2RayVPNServiceSupportsSet
+	status         *CoreI.Status
+	Conf           configure.VPNConfig
+}
+
+type V2RayVPNServiceSupportsSet interface {
+	GetVPNFd() int
+	Setup(Conf string) int
+	Prepare() int
+	Shutdown() int
+	Protect(int) int
 }

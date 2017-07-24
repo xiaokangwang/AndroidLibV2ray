@@ -1,2 +1,4 @@
 gradle/build.gradle
 *.pb.go
+binary*.go
+conf/demo/

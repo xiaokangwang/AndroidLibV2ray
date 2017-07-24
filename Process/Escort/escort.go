@@ -1,4 +1,4 @@
-package libv2ray
+package Escort
 
 import (
 	"os"
@@ -6,16 +6,20 @@ import (
 
 	"log"
 )
+import "github.com/xiaokangwang/AndroidLibV2ray/configure"
+import "github.com/xiaokangwang/AndroidLibV2ray/CoreI"
+import "github.com/xiaokangwang/AndroidLibV2ray/Process"
 
-func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool, tapfd int) {
+func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd int) {
 	count := 42
 	for count > 0 {
 		cmd := exec.Command(proc, pt...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		env := v.conf.additionalEnv
+		ect := Process.EnvironmentCreater{Conf: v.Env, Context: v.status}
+		env := ect.GetEnvironment()
 		env = append(env, os.Environ()...)
-		env = v.addEnvironment(env)
+		env = ect.AddEnvironment(env)
 		cmd.Env = env
 
 		if tapfd != 0 {
@@ -35,7 +39,7 @@ func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool, tapfd
 		err = cmd.Wait()
 		log.Println("Exit")
 		log.Println(err)
-		if v.IsRunning {
+		if v.status.IsRunning {
 			log.Println("Unexpected Exit")
 			count--
 		} else {
@@ -43,23 +47,23 @@ func (v *V2RayPoint) escortRun(proc string, pt []string, forgiveable bool, tapfd
 		}
 	}
 
-	if v.IsRunning && !forgiveable {
+	if v.status.IsRunning && !forgiveable {
 		v.unforgivnesschan <- 0
 	}
 
 }
 
-func (v *V2RayPoint) escortBeg(proc string, pt []string, forgiveable bool) {
-	go v.escortRun(proc, pt, forgiveable, 0)
+func (v *Escorting) escortBeg(proc string, pt []string, forgiveable bool) {
+	go v.EscortRun(proc, pt, forgiveable, 0)
 }
 
-func (v *V2RayPoint) unforgivenessCloser() {
+func (v *Escorting) unforgivenessCloser() {
 	log.Println("unforgivenessCloser() <-v.unforgivnesschan")
 	<-v.unforgivnesschan
-	if v.IsRunning {
-		v.StopLoop()
+	if v.status.IsRunning {
+		//TODO:v.caller.StopLoop()
 		log.Println("Closed As unforgivenessCloser decided so.")
-		v.Callbacks.OnEmitStatus(0, "Closed As unforgivenessCloser decided so.")
+
 	}
 	remain := true
 	for remain {
@@ -74,17 +78,17 @@ func (v *V2RayPoint) unforgivenessCloser() {
 	log.Println("unforgivenessCloser() quit")
 }
 
-func (v *V2RayPoint) escortingUP() {
+func (v *Escorting) escortingUP() {
 	if v.escortProcess != nil {
 		return
 	}
 	v.escortProcess = new([](*os.Process))
 	go v.unforgivenessCloser()
-	for _, esct := range v.conf.esco {
+	for _, esct := range *v.configure {
 		v.escortBeg(esct.Target, esct.Args, esct.Forgiveable)
 	}
 }
-func (v *V2RayPoint) escortingDown() {
+func (v *Escorting) escortingDown() {
 	log.Println("escortingDown() Killing all escorted process ")
 	if v.escortProcess == nil {
 		return
@@ -98,4 +102,16 @@ func (v *V2RayPoint) escortingDown() {
 	}
 	v.escortProcess = nil
 
+}
+
+func NewEscort() *Escorting {
+	return &Escorting{unforgivnesschan: make(chan int)}
+}
+
+type Escorting struct {
+	escortProcess    *[](*os.Process)
+	unforgivnesschan chan int
+	status           *CoreI.Status
+	configure        *[]configure.EscortedProcess
+	Env              *configure.EnvironmentVar
 }

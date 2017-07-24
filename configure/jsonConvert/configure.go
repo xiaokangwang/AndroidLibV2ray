@@ -1,4 +1,4 @@
-package libv2ray
+package jsonConvert
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"log"
 
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/xiaokangwang/AndroidLibV2ray/configure"
 	v2rayJsonWithComment "v2ray.com/ext/encoding/json"
 )
 
@@ -39,6 +40,7 @@ type jsonToPbConverter struct {
 	reading string
 	Datadir string
 	Cfgfile string
+	Env     *configure.EnvironmentVar
 }
 
 func (v *jsonToPbConverter) parseConf() error {

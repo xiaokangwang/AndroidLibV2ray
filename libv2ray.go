@@ -3,6 +3,8 @@ package libv2ray
 import (
 	"fmt"
 
+	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
+
 	"v2ray.com/core"
 	_ "v2ray.com/core/main/distro/all"
 )
@@ -11,7 +13,7 @@ import (
 This func will return libv2ray binding version.
 */
 func CheckVersion() int {
-	return 23
+	return CoreI.CheckVersion()
 }
 
 /*CheckVersionX string

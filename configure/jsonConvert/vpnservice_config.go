@@ -1,4 +1,4 @@
-package libv2ray
+package jsonConvert
 
 type vpnserviceConfig struct {
 	Target      string   `json:"Target"`

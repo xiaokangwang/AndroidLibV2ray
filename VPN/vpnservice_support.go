@@ -1,4 +1,4 @@
-package libv2ray
+package VPN
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 import "github.com/davecgh/go-spew/spew"
 
 type vpnProtectedDialer struct {
-	vp *V2RayPoint
+	vp *VPNSupport
 }
 
 func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, error) {
@@ -138,13 +138,4 @@ func zoneToInt(zone string) int {
 	}
 	n, _, _ := dtoi(zone, 0)
 	return n
-}
-
-/*V2RayVPNServiceSupportsSet To support Android VPN mode*/
-type V2RayVPNServiceSupportsSet interface {
-	GetVPNFd() int
-	Setup(Conf string) int
-	Prepare() int
-	Shutdown() int
-	Protect(int) int
 }
