@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -33,19 +34,21 @@ ConfigureFile can be either the path of config file or
 
 */
 type V2RayPoint struct {
-	ConfigureFile        string
-	ConfigureFileContent string
-
 	status          *CoreI.Status
 	confng          *configure.LibV2RayConf
 	EnvCreater      Process.EnvironmentCreater
 	escorter        *Escort.Escorting
 	Callbacks       V2RayCallbacks
 	v2rayOP         *sync.Mutex
-	interuptDeferto int64
 	Context         *V2RayContext
 	VPNSupports     *VPN.VPNSupport
 	UpdownScripts   *UpDownScript.UpDownScript
+	interuptDeferto int64
+
+	//Legacy prop, should use Context instead
+	PackageName          string
+	ConfigureFile        string
+	ConfigureFileContent string
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -60,43 +63,58 @@ func (v *V2RayPoint) pointloop() {
 	v.status.VpnSupportnodup = false
 
 	//TODO:Parse Configure File
-	//First Guess File type
-	Type, err := vlencoding.GuessConfigType(v.Context.GetConfigureFile())
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	//Deal with legacy API
 	var config core.Config
-	if Type == vlencoding.LibV2RayPackedConfig_FullJsonFile {
+	if v.ConfigureFile == "V2Ray_internal/ConfigureFileContent" {
 		//Convert is needed
 		jc := &jsonConvert.JsonToPbConverter{}
 		jc.Datadir = v.status.PackageName
 		//Load File From Context
-		cf := v.Context.GetConfigureFile()
-		jc.LoadFromFile(cf)
+		//cf := v.Context.GetConfigureFile()
+		jc.LoadFromString(v.ConfigureFileContent)
 		jc.Parse()
 		v.confng = jc.ToPb()
-		jsonctx, _ := os.Open(cf)
-		configx, _ := v2rayconf.LoadJSONConfig(jsonctx)
+		configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
 		config = *configx
-		jsonctx.Close()
-	} else if Type == vlencoding.LibV2RayPackedConfig_FullProto {
-		buf, _ := ioutil.ReadFile(v.Context.GetConfigureFile())
-		err = proto.Unmarshal(buf, &config)
-		//Assert V2RayPart
-		for _, a := range config.GetExtension() {
-			d, _ := a.GetInstance()
-			switch vn := d.(type) {
-			case *configure.LibV2RayConf:
-				v.confng = vn
-			}
-		}
 	} else {
+		//First Guess File type
+		Type, err := vlencoding.GuessConfigType(v.Context.GetConfigureFile())
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-		//Yet To Support
-		return
+		if Type == vlencoding.LibV2RayPackedConfig_FullJsonFile {
+			//Convert is needed
+			jc := &jsonConvert.JsonToPbConverter{}
+			jc.Datadir = v.status.PackageName
+			//Load File From Context
+			cf := v.Context.GetConfigureFile()
+			jc.LoadFromFile(cf)
+			jc.Parse()
+			v.confng = jc.ToPb()
+			jsonctx, _ := os.Open(cf)
+			configx, _ := v2rayconf.LoadJSONConfig(jsonctx)
+			config = *configx
+			jsonctx.Close()
+		} else if Type == vlencoding.LibV2RayPackedConfig_FullProto {
+			buf, _ := ioutil.ReadFile(v.Context.GetConfigureFile())
+			err = proto.Unmarshal(buf, &config)
+			//Assert V2RayPart
+			for _, a := range config.GetExtension() {
+				d, _ := a.GetInstance()
+				switch vn := d.(type) {
+				case *configure.LibV2RayConf:
+					v.confng = vn
+				}
+			}
+		} else {
+
+			//Yet To Support
+			return
+		}
 	}
-
+	var err error
 	//TODO:Load Shipped Binary
 
 	shipb := shippedBinarys.FirstRun{}
@@ -176,6 +194,11 @@ func (v *V2RayPoint) pointloop() {
  */
 func (v *V2RayPoint) RunLoop() {
 	v.v2rayOP.Lock()
+	//Construct Context
+	if v.Context == nil {
+		v.Context = new(V2RayContext)
+		v.Context.PackageName = v.PackageName
+	}
 	if !v.status.IsRunning {
 		go v.pointloop()
 	}
