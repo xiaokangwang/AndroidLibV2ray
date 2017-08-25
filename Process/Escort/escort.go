@@ -60,11 +60,11 @@ func (v *Escorting) escortBeg(proc string, pt []string, forgiveable bool) {
 func (v *Escorting) unforgivenessCloser() {
 	log.Println("unforgivenessCloser() <-v.unforgivnesschan")
 	<-v.unforgivnesschan
-	if v.status.IsRunning {
+	/*if v.status.IsRunning {
 		//TODO:v.caller.StopLoop()
 		log.Println("Closed As unforgivenessCloser decided so.")
 
-	}
+	}*/
 	remain := true
 	for remain {
 		select {
@@ -78,17 +78,24 @@ func (v *Escorting) unforgivenessCloser() {
 	log.Println("unforgivenessCloser() quit")
 }
 
-func (v *Escorting) escortingUP() {
+func (v *Escorting) EscortingUP() {
 	if v.escortProcess != nil {
 		return
 	}
 	v.escortProcess = new([](*os.Process))
 	go v.unforgivenessCloser()
-	for _, esct := range *v.configure {
+	for _, esct := range v.Configure {
 		v.escortBeg(esct.Target, esct.Args, esct.Forgiveable)
 	}
 }
-func (v *Escorting) escortingDown() {
+func (v *Escorting) EscortingUPV() {
+	if v.escortProcess != nil {
+		return
+	}
+	v.escortProcess = new([](*os.Process))
+	go v.unforgivenessCloser()
+}
+func (v *Escorting) EscortingDown() {
 	log.Println("escortingDown() Killing all escorted process ")
 	if v.escortProcess == nil {
 		return
@@ -104,6 +111,10 @@ func (v *Escorting) escortingDown() {
 
 }
 
+func (v *Escorting) SetStatus(st *CoreI.Status) {
+	v.status = st
+}
+
 func NewEscort() *Escorting {
 	return &Escorting{unforgivnesschan: make(chan int)}
 }
@@ -112,6 +123,6 @@ type Escorting struct {
 	escortProcess    *[](*os.Process)
 	unforgivnesschan chan int
 	status           *CoreI.Status
-	configure        *[]configure.EscortedProcess
+	Configure        []*configure.EscortedProcess
 	Env              *configure.EnvironmentVar
 }

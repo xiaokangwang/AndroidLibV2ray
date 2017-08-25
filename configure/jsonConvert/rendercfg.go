@@ -7,17 +7,18 @@ import (
 	"os"
 	"strings"
 
+	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
 	"github.com/xiaokangwang/AndroidLibV2ray/Process"
 )
 
-func (v *jsonToPbConverter) renderAll() {
+func (v *JsonToPbConverter) renderAll() {
 	v.renderesco()
 	v.renderptm()
 	v.rendervpn()
 }
 
-func (v *jsonToPbConverter) renderptm() {
-	Eg := &Process.EnvironmentCreater{Conf: v.Env}
+func (v *JsonToPbConverter) renderptm() {
+	Eg := &Process.EnvironmentCreater{Conf: v.Env, Context: &CoreI.Status{PackageName: v.Datadir}}
 	envr0 := envToMap(Eg.GetEnvironment())
 	mf0 := func(lookup string) string {
 		if envl0, ok := envr0[lookup]; ok {
@@ -60,8 +61,8 @@ func (v *jsonToPbConverter) renderptm() {
 		}
 	}
 }
-func (v *jsonToPbConverter) renderesco() {
-	Eg := &Process.EnvironmentCreater{Conf: v.Env}
+func (v *JsonToPbConverter) renderesco() {
+	Eg := &Process.EnvironmentCreater{Conf: v.Env, Context: &CoreI.Status{PackageName: v.Datadir}}
 	envr := envToMap(Eg.GetEnvironment())
 	for key := range v.conf.esco {
 		mf := func(lookup string) string {
@@ -77,8 +78,8 @@ func (v *jsonToPbConverter) renderesco() {
 	}
 }
 
-func (v *jsonToPbConverter) rendervpn() {
-	Eg := &Process.EnvironmentCreater{Conf: v.Env}
+func (v *JsonToPbConverter) rendervpn() {
+	Eg := &Process.EnvironmentCreater{Conf: v.Env, Context: &CoreI.Status{PackageName: v.Datadir}}
 	envr := envToMap(Eg.GetEnvironment())
 	mf := func(lookup string) string {
 		if envl, ok := envr[lookup]; ok {

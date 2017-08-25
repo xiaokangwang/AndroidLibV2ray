@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"log"
@@ -35,7 +36,7 @@ type libv2rayconfRenderCfgTarget struct {
 	Args   []string `json:"Args"`
 	Source string   `json:"Source"`
 }
-type jsonToPbConverter struct {
+type JsonToPbConverter struct {
 	conf    *libv2rayconf
 	reading string
 	Datadir string
@@ -43,7 +44,7 @@ type jsonToPbConverter struct {
 	Env     *configure.EnvironmentVar
 }
 
-func (v *jsonToPbConverter) parseConf() error {
+func (v *JsonToPbConverter) parseConf() error {
 	jsoncf, err := simplejson.NewFromReader(v.StripComment(v.reading))
 	if err != nil {
 		//v.Callbacks.OnEmitStatus(-2, err.Error())
@@ -152,10 +153,38 @@ func jsonStringDefault(jsons *simplejson.Json, def string) string {
 	return s
 }
 
-func (v *jsonToPbConverter) StripComment(Content string) io.Reader {
+func (v *JsonToPbConverter) StripComment(Content string) io.Reader {
 	Configure := strings.NewReader(Content)
 	v2rayJsonWithComment := &v2rayJsonWithComment.Reader{Reader: Configure}
 	var stp bytes.Buffer
 	io.Copy(&stp, v2rayJsonWithComment)
 	return &stp
+}
+
+func (v *JsonToPbConverter) LoadFromString(ctx string) {
+	v.reading = ctx
+}
+func (v *JsonToPbConverter) LoadFromFile(loc string) error {
+	file, err := ioutil.ReadFile(loc)
+	if err != nil {
+		return err
+	}
+	v.reading = string(file)
+	return nil
+}
+
+func (v *JsonToPbConverter) Parse() error {
+	err := v.parseConf()
+	if err != nil {
+		return err
+	}
+	//ConvertEnv
+	v.Env = &configure.EnvironmentVar{}
+	v.Env.Vars = envToMap(v.conf.additionalEnv)
+	v.renderAll()
+	return nil
+}
+
+func (v *JsonToPbConverter) ToPb() *configure.LibV2RayConf {
+	return ConvertToPb(*v.conf)
 }

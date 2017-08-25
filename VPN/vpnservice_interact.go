@@ -26,22 +26,24 @@ func (v *VPNSupport) VpnSupportReady() {
 	}
 }
 func (v *VPNSupport) startVPNRequire() {
-	e := Escort.NewEscort()
-	go e.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())
+	v.Estr = Escort.NewEscort()
+	v.Estr.SetStatus(v.status)
+	v.Estr.EscortingUPV()
+	go v.Estr.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())
 }
 
 func (v *VPNSupport) askSupportSetInit() {
 	v.VpnSupportSet.Prepare()
 }
 
-func (v *VPNSupport) vpnSetup() {
+func (v *VPNSupport) VpnSetup() {
 	if v.Conf.Service.VPNSetupArg != "" {
 		v.prepareDomainName()
 
 		v.askSupportSetInit()
 	}
 }
-func (v *VPNSupport) vpnShutdown() {
+func (v *VPNSupport) VpnShutdown() {
 
 	if v.Conf.Service.VPNSetupArg != "" {
 		/*
@@ -57,6 +59,7 @@ func (v *VPNSupport) vpnShutdown() {
 		println(err)
 		//}
 		v.VpnSupportSet.Shutdown()
+		v.Estr.EscortingDown()
 	}
 	v.status.VpnSupportnodup = false
 }
@@ -71,6 +74,7 @@ type VPNSupport struct {
 	VpnSupportSet  V2RayVPNServiceSupportsSet
 	status         *CoreI.Status
 	Conf           configure.VPNConfig
+	Estr           *Escort.Escorting
 }
 
 type V2RayVPNServiceSupportsSet interface {
@@ -79,4 +83,8 @@ type V2RayVPNServiceSupportsSet interface {
 	Prepare() int
 	Shutdown() int
 	Protect(int) int
+}
+
+func (v *VPNSupport) SetStatus(st *CoreI.Status) {
+	v.status = st
 }

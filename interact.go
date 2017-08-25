@@ -2,13 +2,26 @@ package libv2ray
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"v2ray.com/core"
+
+	"github.com/golang/protobuf/proto"
 	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
 	"github.com/xiaokangwang/AndroidLibV2ray/Process"
+	"github.com/xiaokangwang/AndroidLibV2ray/Process/Escort"
+	"github.com/xiaokangwang/AndroidLibV2ray/Process/UpDownScript"
+	"github.com/xiaokangwang/AndroidLibV2ray/VPN"
 	"github.com/xiaokangwang/AndroidLibV2ray/configure"
+	"github.com/xiaokangwang/AndroidLibV2ray/configure/jsonConvert"
+	"github.com/xiaokangwang/AndroidLibV2ray/shippedBinarys"
+	vlencoding "github.com/xiaokangwang/V2RayConfigureFileUtil/encoding"
+	v2rayconf "v2ray.com/ext/tools/conf/serial"
 )
 
 /*V2RayPoint V2Ray Point Server
@@ -26,10 +39,13 @@ type V2RayPoint struct {
 	status          *CoreI.Status
 	confng          *configure.LibV2RayConf
 	EnvCreater      Process.EnvironmentCreater
+	escorter        *Escort.Escorting
 	Callbacks       V2RayCallbacks
 	v2rayOP         *sync.Mutex
 	interuptDeferto int64
 	Context         *V2RayContext
+	VPNSupports     *VPN.VPNSupport
+	UpdownScripts   *UpDownScript.UpDownScript
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -44,8 +60,51 @@ func (v *V2RayPoint) pointloop() {
 	v.status.VpnSupportnodup = false
 
 	//TODO:Parse Configure File
+	//First Guess File type
+	Type, err := vlencoding.GuessConfigType(v.Context.GetConfigureFile())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var config core.Config
+	if Type == vlencoding.LibV2RayPackedConfig_FullJsonFile {
+		//Convert is needed
+		jc := &jsonConvert.JsonToPbConverter{}
+		jc.Datadir = v.status.PackageName
+		//Load File From Context
+		cf := v.Context.GetConfigureFile()
+		jc.LoadFromFile(cf)
+		jc.Parse()
+		v.confng = jc.ToPb()
+		jsonctx, _ := os.Open(cf)
+		configx, _ := v2rayconf.LoadJSONConfig(jsonctx)
+		config = *configx
+		jsonctx.Close()
+	} else if Type == vlencoding.LibV2RayPackedConfig_FullProto {
+		buf, _ := ioutil.ReadFile(v.Context.GetConfigureFile())
+		err = proto.Unmarshal(buf, &config)
+		//Assert V2RayPart
+		for _, a := range config.GetExtension() {
+			d, _ := a.GetInstance()
+			switch vn := d.(type) {
+			case *configure.LibV2RayConf:
+				v.confng = vn
+			}
+		}
+	} else {
+
+		//Yet To Support
+		return
+	}
 
 	//TODO:Load Shipped Binary
+
+	shipb := shippedBinarys.FirstRun{}
+	shipb.SetCoreI(v.status)
+	err = shipb.CheckAndExport()
+	if err != nil {
+		log.Println(err)
+	}
 
 	/*TODO:Load Client Config
 	config, err := v2rayconf.LoadJSONConfig(v.parseCfg())
@@ -56,6 +115,8 @@ func (v *V2RayPoint) pointloop() {
 
 		return
 	}*/
+
+	v.status.Vpoint, err = core.New(&config)
 	/* TODO: Start V2Ray Core
 	vPoint, err := core.New(config)
 	if err != nil {
@@ -67,10 +128,13 @@ func (v *V2RayPoint) pointloop() {
 	}*/
 
 	v.status.IsRunning = true
+	v.status.Vpoint.Start()
 	/*log.Trace(errors.New("vPoint.Start()"))
 	vPoint.Start()
 	v.vpoint = vPoint
 	*/
+	v.escorter.Configure = v.confng.RootModeConf.Escorting
+	v.escorter.EscortingUP()
 	/* TODO:RunVPN Escort
 	log.Trace(errors.New("v.escortingUP()"))
 	v.escortingUP()
@@ -83,9 +147,17 @@ func (v *V2RayPoint) pointloop() {
 		time.Sleep(5 * time.Second)
 		v.interuptDeferto = 0
 	}()
+	//Set Necessary Props First
+	v.VPNSupports.Conf = *v.confng.GetVpnConf()
+	v.VPNSupports.SetStatus(v.status)
+	v.VPNSupports.VpnSetup()
 	/* TODO: setup VPN
 	v.vpnSetup()
 	*/
+	v.UpdownScripts.SetStatus(v.status)
+	v.UpdownScripts.Configure = v.confng.RootModeConf.Scripts
+	v.UpdownScripts.Env = v.confng.Env
+	v.UpdownScripts.RunUpScript()
 	/* TODO: Run Up Script
 	if v.conf != nil {
 		env := v.conf.additionalEnv
@@ -113,6 +185,7 @@ func (v *V2RayPoint) RunLoop() {
 func (v *V2RayPoint) stopLoopW() {
 	v.status.IsRunning = false
 	v.status.Vpoint.Close()
+	v.UpdownScripts.RunDownScript()
 	/* TODO:Run Down Script
 	if v.conf != nil {
 		env := v.conf.additionalEnv
@@ -122,6 +195,8 @@ func (v *V2RayPoint) stopLoopW() {
 		if err != nil {
 			log.Trace(errors.New("OnDown failed to exec").Base(err))
 		}*/
+	v.VPNSupports.VpnShutdown()
+	v.escorter.EscortingDown()
 	/* TODO: Escort Down
 		log.Trace(errors.New("v.escortingDown()"))
 		v.escortingDown()
@@ -146,7 +221,8 @@ func (v *V2RayPoint) StopLoop() {
 
 /*NewV2RayPoint new V2RayPoint*/
 func NewV2RayPoint() *V2RayPoint {
-	return &V2RayPoint{v2rayOP: new(sync.Mutex)}
+	//panic("Creating VPoint")
+	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}, UpdownScripts: &UpDownScript.UpDownScript{}}
 }
 
 /*NetworkInterrupted inform us to restart the v2ray,
@@ -187,6 +263,10 @@ func (v *V2RayPoint) UpgradeToContext() {
 	}
 }
 
+func (v *V2RayPoint) GetIsRunning() bool {
+	return v.status.IsRunning
+}
+
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
 type V2RayVPNServiceSupportsSet interface {
 	GetVPNFd() int
@@ -194,4 +274,14 @@ type V2RayVPNServiceSupportsSet interface {
 	Prepare() int
 	Shutdown() int
 	Protect(int) int
+}
+
+//Delegate Funcation
+func (v *V2RayPoint) VpnSupportReady() {
+	v.VPNSupports.VpnSupportReady()
+}
+
+//Delegate Funcation
+func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
+	v.VPNSupports.VpnSupportSet = vs
 }

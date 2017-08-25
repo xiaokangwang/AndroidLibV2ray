@@ -1,6 +1,7 @@
 package jsonConvert
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/xiaokangwang/AndroidLibV2ray/configure"
@@ -21,6 +22,7 @@ func ConvertToPb(leagcy libv2rayconf) *configure.LibV2RayConf {
 		designatedAppendee.Args = EscortedProcessInLegacy.Args
 		NextGenerationProtobufConfigureStruct.RootModeConf.Escorting = append(NextGenerationProtobufConfigureStruct.RootModeConf.Escorting, designatedAppendee)
 	}
+	NextGenerationProtobufConfigureStruct.VpnConf = &configure.VPNConfig{}
 	NextGenerationProtobufConfigureStruct.VpnConf.Service = &configure.VPNServiceConfig{}
 	NextGenerationProtobufConfigureStruct.VpnConf.Service.Target = leagcy.vpnConfig.Target
 	NextGenerationProtobufConfigureStruct.VpnConf.Service.VPNSetupArg = leagcy.vpnConfig.VPNSetupArg
@@ -31,6 +33,7 @@ func ConvertToPb(leagcy libv2rayconf) *configure.LibV2RayConf {
 	NextGenerationProtobufConfigureStruct.VpnConf.PreparedDomainName.DomainNameList = leagcy.dnsloopfix.DomainNameList
 	NextGenerationProtobufConfigureStruct.Env = &configure.EnvironmentVar{}
 	NextGenerationProtobufConfigureStruct.Env.Vars = envToMap(leagcy.additionalEnv)
+	fmt.Println(NextGenerationProtobufConfigureStruct.String())
 	return NextGenerationProtobufConfigureStruct
 }
 
