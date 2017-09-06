@@ -110,6 +110,11 @@ func (vc *V2RayContext) ReadProp(name string) (string, error) {
 	return string(content), nil
 }
 
+func (vc *V2RayContext) ReadPropD(name string) string {
+	ctx, _ := vc.ReadProp(name)
+	return ctx
+}
+
 func (vc *V2RayContext) WriteProp(name string, cont string) error {
 	os.MkdirAll(vc.Status.GetDataDir()+"config", 0700)
 	return ioutil.WriteFile(vc.Status.GetDataDir()+"config/"+name, []byte(cont), 0600)
