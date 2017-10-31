@@ -2,3 +2,6 @@ gradle/build.gradle
 *.pb.go
 binary*.go
 conf/demo/
+
+demo/
+libv2ray.aar
