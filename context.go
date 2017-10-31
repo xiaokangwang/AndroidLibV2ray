@@ -17,8 +17,7 @@ func NewLib2rayContext() *V2RayContext {
 type V2RayContext struct {
 	configureFile string
 	Callbacks     V2RayContextCallbacks
-	PackageName   string
-	Status        CoreI.Status
+	Status        *CoreI.Status
 }
 
 const configureFile = "ConfigureFile"

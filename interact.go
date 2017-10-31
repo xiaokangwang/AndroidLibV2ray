@@ -197,7 +197,7 @@ func (v *V2RayPoint) RunLoop() {
 	//Construct Context
 	if v.Context == nil {
 		v.Context = new(V2RayContext)
-		v.Context.PackageName = v.PackageName
+		v.status.PackageName = v.PackageName
 	}
 	if !v.status.IsRunning {
 		go v.pointloop()
