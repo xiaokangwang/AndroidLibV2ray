@@ -1,12 +1,12 @@
 Platdep=shippedBinary.386 shippedBinary.amd64 shippedBinary.arm64 shippedBinary.arm
 
-shippedBinaryDep: $GOPATH/bin/go-bindata
+shippedBinaryDep:
 		go get -u github.com/jteeuwen/go-bindata/...
 
 shippedBinary.%:
-	$GOPATH/bin/go-bindata -nometadata -nomemcopy -pkg shippedBinarys -o ./binary_$*.go -tags $* ArchIndep/ ArchDep/$*/
+	go-bindata -nometadata -nomemcopy -pkg shippedBinarys -o ./binary_$*.go -tags $* ArchIndep/ ArchDep/$*/
 
-shippedBinary: $(Platdep)
+shippedBinary:shippedBinaryDep  $(Platdep)
 	@echo "Done"
 
 clean:
