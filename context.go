@@ -11,7 +11,7 @@ import (
 )
 
 func NewLib2rayContext() *V2RayContext {
-	return new(V2RayContext)
+	return &V2RayContext{Status: new(CoreI.Status)}
 }
 
 type V2RayContext struct {
@@ -28,6 +28,11 @@ func (vc *V2RayContext) CheckConfigureFile() bool {
 		return false
 	}
 	return true
+}
+
+func (vc *V2RayContext) SetPackageName(PackageName string) {
+	//Check if file exist
+	vc.Status.PackageName = PackageName
 }
 
 func exists(path string) bool {

@@ -297,6 +297,7 @@ Client can opt-in V2Ray's Next Generation Interface
 func (v *V2RayPoint) UpgradeToContext() {
 	if v.Context == nil {
 		v.Context = new(V2RayContext)
+		v.Context.Status = v.status
 	}
 }
 
