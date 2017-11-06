@@ -9,5 +9,8 @@ asset:
 shippedBinary:
 	cd shippedBinary; $(MAKE) shippedBinary
 
-all: asset pb shippedBinary
+fetchDep:
+	-go get -u github.com/xiaokangwang/V2RayConfigureFileUtil
+
+all: asset pb shippedBinary fetchDep
 	@echo DONE

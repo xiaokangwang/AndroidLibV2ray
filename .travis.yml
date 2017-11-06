@@ -8,8 +8,8 @@ git:
 before_script:
 - sudo ntpdate -u time.google.com
 - date
+- make all
 - go get -u github.com/xiaokangwang/AndroidLibV2ray/
-- go get -u golang.org/x/tools/cmd/...
 - go generate github.com/xiaokangwang/AndroidLibV2ray/
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
