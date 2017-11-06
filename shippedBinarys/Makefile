@@ -1,6 +1,6 @@
 Platdep=shippedBinary.386 shippedBinary.amd64 shippedBinary.arm64 shippedBinary.arm
 
-shippedBinaryDep: $GOPATH/bin/go-bindata
+shippedBinaryDep:
 		go get -u github.com/jteeuwen/go-bindata/...
 
 shippedBinary.%:
