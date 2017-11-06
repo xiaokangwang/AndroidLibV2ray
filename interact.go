@@ -2,6 +2,7 @@ package libv2ray
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"v2ray.com/core"
+	"v2ray.com/ext/sysio"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
@@ -22,6 +24,7 @@ import (
 	"github.com/xiaokangwang/AndroidLibV2ray/configure/jsonConvert"
 	"github.com/xiaokangwang/AndroidLibV2ray/shippedBinarys"
 	vlencoding "github.com/xiaokangwang/V2RayConfigureFileUtil/encoding"
+	mobasset "golang.org/x/mobile/asset"
 	v2rayconf "v2ray.com/ext/tools/conf/serial"
 )
 
@@ -244,6 +247,17 @@ func (v *V2RayPoint) StopLoop() {
 
 /*NewV2RayPoint new V2RayPoint*/
 func NewV2RayPoint() *V2RayPoint {
+	//Initialize asset API, Since Raymond Will not let notify the asset location inside Process,
+	//We need to set location outside V2Ray
+	const assetperfix = "/dev/libv2rayfs0/asset"
+	os.Setenv("v2ray.location.asset", assetperfix)
+	//Now we handle read
+	sysio.NewFileReader = func(path string) (io.ReadCloser, error) {
+		if strings.HasPrefix(path, assetperfix) {
+			return mobasset.Open(path[len(assetperfix)+1:])
+		}
+		return os.Open(path)
+	}
 	//panic("Creating VPoint")
 	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}, UpdownScripts: &UpDownScript.UpDownScript{}}
 }
