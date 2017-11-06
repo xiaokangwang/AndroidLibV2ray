@@ -8,6 +8,7 @@ git:
 before_script:
 - sudo ntpdate -u time.google.com
 - date
+- go get -u github.com/xiaokangwang/AndroidLibV2ray/...
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
 after_success:
