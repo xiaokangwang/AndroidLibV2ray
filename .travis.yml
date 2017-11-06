@@ -1,0 +1,13 @@
+sudo: required
+language: go
+go:
+- 1.9
+go_import_path: github.com/xiaokangwang/AndroidLibV2ray
+git:
+  depth: 5
+before_script:
+- sudo ntpdate -u time.google.com
+- date
+script:
+- go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
+after_success:
