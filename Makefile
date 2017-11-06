@@ -1,4 +1,5 @@
 pb:
+	  go get -u github.com/golang/protobuf/protoc-gen-go
 		@echo "pb Start"
 		cd configure && make pb
 asset:
