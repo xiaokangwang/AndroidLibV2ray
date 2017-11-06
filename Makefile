@@ -13,7 +13,7 @@ shippedBinary:
 fetchDep:
 	-go get -u github.com/xiaokangwang/V2RayConfigureFileUtil
 	-cd $(GOPATH)/src/github.com/xiaokangwang/V2RayConfigureFileUtil;$(MAKE) all
-  go get -u github.com/xiaokangwang/V2RayConfigureFileUtil
+	go get -u github.com/xiaokangwang/V2RayConfigureFileUtil
 	go get -u github.com/xiaokangwang/AndroidLibV2ray
 
 all: asset pb shippedBinary fetchDep
