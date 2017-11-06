@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"v2ray.com/core"
-	"v2ray.com/core/common/platform"
 	"v2ray.com/ext/sysio"
 
 	"github.com/golang/protobuf/proto"
@@ -275,7 +274,7 @@ func NewV2RayPoint() *V2RayPoint {
 		}
 		return os.Open(path)
 	}
-	platform.ForceReevaluate()
+	//platform.ForceReevaluate()
 	//panic("Creating VPoint")
 	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}, UpdownScripts: &UpDownScript.UpDownScript{}}
 }
