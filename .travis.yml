@@ -9,7 +9,6 @@ before_script:
 - sudo ntpdate -u time.google.com
 - date
 - make all
-- go get -u github.com/xiaokangwang/AndroidLibV2ray/
 - go generate github.com/xiaokangwang/AndroidLibV2ray/
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
