@@ -3,6 +3,7 @@ pbSource := $(shell echo *.proto)
 #	protoc --go_out=. $^
 
 pb: clean
+	tree $(GOPATH)
 	$(GOPATH)/bin/protoc --go_out=. $(pbSource)
 	@echo "Done"
 
