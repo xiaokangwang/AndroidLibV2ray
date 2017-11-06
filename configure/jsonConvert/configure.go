@@ -180,11 +180,17 @@ func (v *JsonToPbConverter) Parse() error {
 	}
 	//ConvertEnv
 	v.Env = &configure.EnvironmentVar{}
+	if v.conf == nil {
+		return nil
+	}
 	v.Env.Vars = envToMap(v.conf.additionalEnv)
 	v.renderAll()
 	return nil
 }
 
 func (v *JsonToPbConverter) ToPb() *configure.LibV2RayConf {
+	if v.conf == nil {
+		return nil
+	}
 	return ConvertToPb(*v.conf)
 }

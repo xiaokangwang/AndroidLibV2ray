@@ -97,8 +97,14 @@ func (v *V2RayPoint) pointloop() {
 			jc.Parse()
 			v.confng = jc.ToPb()
 			jsonctx, _ := os.Open(cf)
-			configx, _ := v2rayconf.LoadJSONConfig(jsonctx)
-			config = *configx
+			configx, err := v2rayconf.LoadJSONConfig(jsonctx)
+			if err != nil {
+				log.Println("JSON Parse Err:" + err.Error())
+
+			}
+			if configx != nil {
+				config = *configx
+			}
 			jsonctx.Close()
 		} else if Type == vlencoding.LibV2RayPackedConfig_FullProto {
 			buf, _ := ioutil.ReadFile(v.Context.GetConfigureFile())
@@ -109,6 +115,7 @@ func (v *V2RayPoint) pointloop() {
 				switch vn := d.(type) {
 				case *configure.LibV2RayConf:
 					v.confng = vn
+				default:
 				}
 			}
 		} else {
@@ -138,6 +145,10 @@ func (v *V2RayPoint) pointloop() {
 	}*/
 
 	v.status.Vpoint, err = core.New(&config)
+	if err != nil {
+		log.Println("VPoint Start Err:" + err.Error())
+
+	}
 	/* TODO: Start V2Ray Core
 	vPoint, err := core.New(config)
 	if err != nil {
@@ -154,41 +165,44 @@ func (v *V2RayPoint) pointloop() {
 	vPoint.Start()
 	v.vpoint = vPoint
 	*/
-	v.escorter.Configure = v.confng.RootModeConf.Escorting
-	v.escorter.EscortingUP()
-	/* TODO:RunVPN Escort
-	log.Trace(errors.New("v.escortingUP()"))
-	v.escortingUP()
-	*/
-	//Now, surpress interrupt signal for 5 sec
+	if v.confng != nil {
+		v.escorter.Configure = v.confng.RootModeConf.Escorting
+		v.escorter.EscortingUP()
 
-	v.interuptDeferto = 1
+		/* TODO:RunVPN Escort
+		log.Trace(errors.New("v.escortingUP()"))
+		v.escortingUP()
+		*/
+		//Now, surpress interrupt signal for 5 sec
 
-	go func() {
-		time.Sleep(5 * time.Second)
-		v.interuptDeferto = 0
-	}()
-	//Set Necessary Props First
-	v.VPNSupports.Conf = *v.confng.GetVpnConf()
-	v.VPNSupports.SetStatus(v.status)
-	v.VPNSupports.VpnSetup()
-	/* TODO: setup VPN
-	v.vpnSetup()
-	*/
-	v.UpdownScripts.SetStatus(v.status)
-	v.UpdownScripts.Configure = v.confng.RootModeConf.Scripts
-	v.UpdownScripts.Env = v.confng.Env
-	v.UpdownScripts.RunUpScript()
-	/* TODO: Run Up Script
-	if v.conf != nil {
-		env := v.conf.additionalEnv
-		log.Trace(errors.New("Exec Upscript()"))
-		err = v.runbash(v.conf.upscript, env)
-		if err != nil {
-			log.Trace(errors.New("OnUp failed to exec").Base(err))
+		v.interuptDeferto = 1
+
+		go func() {
+			time.Sleep(5 * time.Second)
+			v.interuptDeferto = 0
+		}()
+		//Set Necessary Props First
+		v.VPNSupports.Conf = *v.confng.GetVpnConf()
+		v.VPNSupports.SetStatus(v.status)
+		v.VPNSupports.VpnSetup()
+		/* TODO: setup VPN
+		v.vpnSetup()
+		*/
+		v.UpdownScripts.SetStatus(v.status)
+		v.UpdownScripts.Configure = v.confng.RootModeConf.Scripts
+		v.UpdownScripts.Env = v.confng.Env
+		v.UpdownScripts.RunUpScript()
+		/* TODO: Run Up Script
+		if v.conf != nil {
+			env := v.conf.additionalEnv
+			log.Trace(errors.New("Exec Upscript()"))
+			err = v.runbash(v.conf.upscript, env)
+			if err != nil {
+				log.Trace(errors.New("OnUp failed to exec").Base(err))
+			}
 		}
+		*/
 	}
-	*/
 	v.Callbacks.OnEmitStatus(0, "Running")
 	//v.parseCfgDone()
 }
@@ -211,23 +225,25 @@ func (v *V2RayPoint) RunLoop() {
 func (v *V2RayPoint) stopLoopW() {
 	v.status.IsRunning = false
 	v.status.Vpoint.Close()
-	v.UpdownScripts.RunDownScript()
-	/* TODO:Run Down Script
-	if v.conf != nil {
-		env := v.conf.additionalEnv
-		log.Trace(errors.New("Running downscript"))
-		err := v.runbash(v.conf.downscript, env)
+	if v.confng != nil {
+		v.UpdownScripts.RunDownScript()
+		/* TODO:Run Down Script
+		if v.conf != nil {
+			env := v.conf.additionalEnv
+			log.Trace(errors.New("Running downscript"))
+			err := v.runbash(v.conf.downscript, env)
 
-		if err != nil {
-			log.Trace(errors.New("OnDown failed to exec").Base(err))
-		}*/
-	v.VPNSupports.VpnShutdown()
-	v.escorter.EscortingDown()
-	/* TODO: Escort Down
-		log.Trace(errors.New("v.escortingDown()"))
-		v.escortingDown()
+			if err != nil {
+				log.Trace(errors.New("OnDown failed to exec").Base(err))
+			}*/
+		v.VPNSupports.VpnShutdown()
+		v.escorter.EscortingDown()
+		/* TODO: Escort Down
+			log.Trace(errors.New("v.escortingDown()"))
+			v.escortingDown()
+		}
+		*/
 	}
-	*/
 	v.Callbacks.OnEmitStatus(0, "Closed")
 
 }
