@@ -12,4 +12,5 @@ before_script:
 - make downloadGoMobile
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
+- gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
 after_success:
