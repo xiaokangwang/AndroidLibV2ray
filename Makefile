@@ -21,6 +21,6 @@ fetchDep:
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
-	mkdir ~/andrsdk; cd ~/andrsdk ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/2c71f2e6e9457702d100c6b23d980d7437f20315/ubuntu-cli-install-android-sdk.sh | sudo bash -
+	mkdir ~/andrsdk; cd ~/andrsdk ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/14eb128c0c48780dd3022efb26a3a0108ba03eee/ubuntu-cli-install-android-sdk.sh | sudo bash -
 all: asset pb shippedBinary fetchDep
 	@echo DONE
