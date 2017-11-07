@@ -25,7 +25,7 @@ downloadGoMobile:
 	gomobile init
 
 BuildMobile:
-	source ~/.bashrc;gomobile init;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
+	bash -c 'source ~/.bashrc;gomobile init;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray'
 
 all: asset pb shippedBinary fetchDep
 	@echo DONE
