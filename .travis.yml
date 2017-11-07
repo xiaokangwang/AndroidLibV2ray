@@ -9,6 +9,8 @@ before_script:
 - sudo ntpdate -u time.google.com
 - date
 - make all
+- make downloadGoMobile
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
+- make BuildMobile
 after_success:

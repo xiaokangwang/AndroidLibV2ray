@@ -18,5 +18,17 @@ fetchDep:
 	-cd $(GOPATH)/src/github.com/xiaokangwang/libV2RayAuxiliaryURL; $(MAKE) all
 	go get -u github.com/xiaokangwang/AndroidLibV2ray
 
+ANDROID_HOME=$(HOME)/android-sdk-linux
+export ANDROID_HOME
+downloadGoMobile:
+	go get golang.org/x/mobile/cmd/gomobile
+	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
+	cd ~ ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/c23f4e3ca83d3a97b05a53924d7634ff4f80e434/ubuntu-cli-install-android-sdk.sh | sudo bash -
+	ls ~/android-sdk-linux/
+	gomobile init -ndk ~/android-ndk-r15c;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
+
+BuildMobile:
+	@echo Stub
+
 all: asset pb shippedBinary fetchDep
 	@echo DONE
