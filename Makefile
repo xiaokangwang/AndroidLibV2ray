@@ -19,6 +19,7 @@ fetchDep:
 	go get -u github.com/xiaokangwang/AndroidLibV2ray
 
 ANDROID_HOME=～/android-sdk-linux
+export ANDROID_HOME
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
