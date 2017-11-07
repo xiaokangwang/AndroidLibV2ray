@@ -18,6 +18,7 @@ fetchDep:
 	-cd $(GOPATH)/src/github.com/xiaokangwang/libV2RayAuxiliaryURL; $(MAKE) all
 	go get -u github.com/xiaokangwang/AndroidLibV2ray
 
+ANDROID_HOME=～/android-sdk-linux
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
