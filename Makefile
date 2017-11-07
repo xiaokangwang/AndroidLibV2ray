@@ -18,7 +18,7 @@ fetchDep:
 	-cd $(GOPATH)/src/github.com/xiaokangwang/libV2RayAuxiliaryURL; $(MAKE) all
 	go get -u github.com/xiaokangwang/AndroidLibV2ray
 
-ANDROID_HOME=～/android-sdk-linux
+ANDROID_HOME=~/android-sdk-linux
 export ANDROID_HOME
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
