@@ -22,7 +22,8 @@ downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
 	cd ~ ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/3da013b40f769eb481316d692cb54009310151f9/ubuntu-cli-install-android-sdk.sh | sudo bash -
-	gomobile init;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
+	ls ~
+	gomobile init -ndk ~/android-ndk-r12b;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
 
 BuildMobile:
 	@echo Stub
