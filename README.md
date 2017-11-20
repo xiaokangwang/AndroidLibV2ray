@@ -1,6 +1,6 @@
 # AndroidLibV2ray
 
-![Build Status](https://api.travis-ci.org/xiaokangwang/AndroidLibV2ray.svg?branch=master)\
+![Build Status](https://api.travis-ci.org/xiaokangwang/AndroidLibV2ray.svg?branch=master)
 
 在安卓设备上使用V2RayGo，
 若在使用vmess+tcp(即最基本的设置），请按conf文件夹中的conf_vpnservice.json为模板进行修改;
