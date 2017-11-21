@@ -21,4 +21,4 @@ deploy:
   file: libv2ray.aar
   skip_cleanup: true
   on:
-    repo: xiaokangwang/AndroidLibV2ray
+    tags: true
