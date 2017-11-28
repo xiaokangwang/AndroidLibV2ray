@@ -27,6 +27,15 @@ downloadGoMobile:
 	ls ~/android-sdk-linux/
 	gomobile init -ndk ~/android-ndk-r15c;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
 
+buildVGO:
+	git clone https://github.com/xiaokangwang/V2RayGO.git
+	ln libv2ray.aar V2RayGO/libv2ray/libv2ray.aar
+	cd V2RayGO; ./gradlew
+	sudo apt install zipalign
+	cd V2RayGO/app/build/outputs/apk/release; zipalign -v -p 4 app-release-unsigned.apk app-release-unsigned-aligned.apk
+	cd V2RayGO/app/build/outputs/apk/release; keytool -genkey -v -keystore temp-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias tempkey
+	cd V2RayGO/app/build/outputs/apk/release; $(ANDROID_HOME)/build-tools/27.0.1/apksigner sign --ks temp-release-key.jks --out app-release.apk app-release-unsigned-aligned.apk
+
 BuildMobile:
 	@echo Stub
 
