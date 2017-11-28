@@ -30,6 +30,7 @@ downloadGoMobile:
 buildVGO:
 	git clone https://github.com/xiaokangwang/V2RayGO.git
 	ln libv2ray.aar V2RayGO/libv2ray/libv2ray.aar
+	cd V2RayGO;echo "sdk.dir=$(ANDROID_HOME)" > local.properties
 	cd V2RayGO; ./gradlew
 	sudo apt install zipalign
 	cd V2RayGO/app/build/outputs/apk/release; zipalign -v -p 4 app-release-unsigned.apk app-release-unsigned-aligned.apk
