@@ -34,7 +34,7 @@ buildVGO:
 	cd V2RayGO; ./gradlew assembleRelease
 	cd V2RayGO/app/build/outputs/apk/release; $(ANDROID_HOME)/build-tools/27.0.1/zipalign -v -p 4 app-release-unsigned.apk app-release-unsigned-aligned.apk
 	cd V2RayGO/app/build/outputs/apk/release; keytool -genkey -v -keystore temp-release-key.jks -keyalg RSA -keysize 2048 -validity 365 -alias tempkey -dname "CN=vvv.kkdev.org, OU=VV, O=VVV, L=VVVVV, S=VV, C=VV" -storepass password -keypass password -noprompt
-	cd V2RayGO/app/build/outputs/apk/release; $(ANDROID_HOME)/build-tools/27.0.1/apksigner sign --ks temp-release-key.jks --out app-release.apk app-release-unsigned-aligned.apk -storepass password -keypass password -noprompt
+	cd V2RayGO/app/build/outputs/apk/release; $(ANDROID_HOME)/build-tools/27.0.1/apksigner sign --ks temp-release-key.jks  --ks-pass pass:password --key-pass pass:password --out app-release.apk app-release-unsigned-aligned.apk
 
 BuildMobile:
 	@echo Stub
