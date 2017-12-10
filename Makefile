@@ -23,7 +23,7 @@ export ANDROID_HOME
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
-	cd ~ ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/c23f4e3ca83d3a97b05a53924d7634ff4f80e434/ubuntu-cli-install-android-sdk.sh | sudo bash -
+	cd ~ ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/5dce155fc4f7ea1bf63d3c705b4ebe29b7b2c01f/ubuntu-cli-install-android-sdk.sh | sudo bash -
 	ls ~/android-sdk-linux/
 	gomobile init -ndk ~/android-ndk-r15c;gomobile bind -v  -tags json github.com/xiaokangwang/AndroidLibV2ray
 
