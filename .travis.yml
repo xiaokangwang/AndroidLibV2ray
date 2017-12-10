@@ -10,7 +10,7 @@ before_script:
 - date
 - make all
 - make downloadGoMobile
-- sudo make buildVGO
+- travis_wait 180 sudo make buildVGO
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
 - make BuildMobile
