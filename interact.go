@@ -77,7 +77,10 @@ func (v *V2RayPoint) pointloop() {
 		jc.LoadFromString(v.ConfigureFileContent)
 		jc.Parse()
 		v.confng = jc.ToPb()
-		configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+		configx, err := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+		if err != nil {
+				log.Println("JSON Parse Err:" + err.Error())
+			}
 		config = *configx
 	} else {
 		//First Guess File type
