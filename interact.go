@@ -287,7 +287,13 @@ func NewV2RayPoint() *V2RayPoint {
 	//Now we handle read
 	sysio.NewFileReader = func(path string) (io.ReadCloser, error) {
 		if strings.HasPrefix(path, assetperfix) {
-			return mobasset.Open(path[len(assetperfix)+1:])
+			p := path[len(assetperfix)+1:]
+			//is it overridden?
+			by, ok := overridedAssets[p]
+			if ok {
+				return os.Open(by)
+			}
+			return mobasset.Open(p)
 		}
 		return os.Open(path)
 	}
