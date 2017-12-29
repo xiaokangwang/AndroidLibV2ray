@@ -1,12 +1,15 @@
 package VPN
 
 import (
+	"reflect"
+
 	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
 	"github.com/xiaokangwang/AndroidLibV2ray/Process/Escort"
 	"github.com/xiaokangwang/AndroidLibV2ray/configure"
 
 	"golang.org/x/sys/unix"
 
+	"v2ray.com/core/app"
 	"v2ray.com/core/transport/internet"
 )
 
@@ -70,11 +73,19 @@ func (v *VPNSupport) setV2RayDialer() {
 }
 
 type VPNSupport struct {
-	prepareddomain preparedDomain
-	VpnSupportSet  V2RayVPNServiceSupportsSet
-	status         *CoreI.Status
-	Conf           configure.VPNConfig
-	Estr           *Escort.Escorting
+	prepareddomain           preparedDomain
+	VpnSupportSet            V2RayVPNServiceSupportsSet
+	status                   *CoreI.Status
+	Conf                     configure.VPNConfig
+	Estr                     *Escort.Escorting
+	usewaVingOceanVPNBackend bool
+}
+
+func (v *VPNSupport) getSpace() app.Space {
+	VpV := reflect.ValueOf(v.status.Vpoint)
+	Space := VpV.FieldByName("space")
+	s := Space.Interface().(app.Space)
+	return s
 }
 
 type V2RayVPNServiceSupportsSet interface {
