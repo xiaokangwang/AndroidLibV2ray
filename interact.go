@@ -38,8 +38,6 @@ provide configure file with @[ConfigureFileContent] in JSON
 format or "V2Ray_internal/AsPbConfigureFileContent"
 in protobuf format.
 
-
-
 */
 type V2RayPoint struct {
 	status          *CoreI.Status
