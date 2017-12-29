@@ -17,7 +17,7 @@ fetchDep:
 	-go get -u github.com/xiaokangwang/AndroidLibV2ray
 	-cd $(GOPATH)/src/github.com/xiaokangwang/libV2RayAuxiliaryURL; $(MAKE) all
 	-go get -u github.com/xiaokangwang/AndroidLibV2ray
-	-cd github.com/xiaokangwang/waVingOcean/configure; $(MAKE) pb
+	-cd $(GOPATH)/src/github.com/xiaokangwang/waVingOcean/configure; $(MAKE) pb
 	go get -u github.com/xiaokangwang/AndroidLibV2ray
 
 ANDROID_HOME=$(HOME)/android-sdk-linux
