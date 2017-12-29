@@ -39,7 +39,7 @@ func (v *VPNSupport) startVPNRequire() {
 		v.Estr.EscortingUPV()
 		go v.Estr.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())
 	} else {
-		v.stopNextGen()
+		v.startNextGen()
 	}
 }
 
