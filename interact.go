@@ -68,17 +68,34 @@ func (v *V2RayPoint) pointloop() {
 	//TODO:Parse Configure File
 	//Deal with legacy API
 	var config core.Config
-	if v.ConfigureFile == "V2Ray_internal/ConfigureFileContent" {
-		//Convert is needed
-		jc := &jsonConvert.JsonToPbConverter{}
-		jc.Datadir = v.status.PackageName
-		//Load File From Context
-		//cf := v.Context.GetConfigureFile()
-		jc.LoadFromString(v.ConfigureFileContent)
-		jc.Parse()
-		v.confng = jc.ToPb()
-		configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
-		config = *configx
+	if strings.HasPrefix(v.ConfigureFile, "V2Ray_internal") {
+		if v.ConfigureFile == "V2Ray_internal/ConfigureFileContent" {
+			//Convert is needed
+			jc := &jsonConvert.JsonToPbConverter{}
+			jc.Datadir = v.status.PackageName
+			//Load File From Context
+			//cf := v.Context.GetConfigureFile()
+			jc.LoadFromString(v.ConfigureFileContent)
+			jc.Parse()
+			v.confng = jc.ToPb()
+			configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+			config = *configx
+		} else {
+			buf := []byte(v.ConfigureFileContent)
+			err := proto.Unmarshal(buf, &config)
+			if err != nil {
+				log.Println(err)
+			}
+			//Assert V2RayPart
+			for _, a := range config.GetExtension() {
+				d, _ := a.GetInstance()
+				switch vn := d.(type) {
+				case *configure.LibV2RayConf:
+					v.confng = vn
+				default:
+				}
+			}
+		}
 	} else {
 		//First Guess File type
 		Type, err := vlencoding.GuessConfigType(v.Context.GetConfigureFile())
