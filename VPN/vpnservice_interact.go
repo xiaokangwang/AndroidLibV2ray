@@ -105,6 +105,11 @@ func (v *VPNSupport) startNextGen() {
 	v.lowerup = wavingocean.NewLowerUp(*cfg, f, &V2Dialer{ser: v.getSpace()}, context.TODO())
 	go v.lowerup.Up()
 }
+
+func (v *VPNSupport) OptinNextGenerationTunInterface() {
+	v.usewaVingOceanVPNBackend = true
+}
+
 func (v *VPNSupport) stopNextGen() {
 	v.lowerup.Down()
 }

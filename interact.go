@@ -366,3 +366,7 @@ func (v *V2RayPoint) VpnSupportReady() {
 func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
 	v.VPNSupports.VpnSupportSet = vs
 }
+
+func (v *V2RayPoint) OptinNextGenerationTunInterface() {
+	v.VPNSupports.OptinNextGenerationTunInterface()
+}
