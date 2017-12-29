@@ -34,6 +34,11 @@ This is territory of Go, so no getter and setters!
 Notice:
 ConfigureFile can be either the path of config file or
 "V2Ray_internal/ConfigureFileContent" in case you wish to
+provide configure file with @[ConfigureFileContent] in JSON
+format or "V2Ray_internal/AsPbConfigureFileContent"
+in protobuf format.
+
+
 
 */
 type V2RayPoint struct {
