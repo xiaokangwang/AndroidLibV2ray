@@ -10,6 +10,7 @@ import (
 	"v2ray.com/core/app/dispatcher"
 	"v2ray.com/core/common/buf"
 	v2net "v2ray.com/core/common/net"
+	"v2ray.com/core/common/signal"
 )
 
 type V2Dialer struct {
@@ -35,39 +36,35 @@ func (vd *V2Dialer) Dial(network, address string, port uint16, ctx context.Conte
 	}
 	//Copy data
 	conn1, conn2 := net.Pipe()
+
+	input := ray.InboundInput()
+	output := ray.InboundOutput()
+
+	requestDone := signal.ExecuteAsync(func() error {
+		defer input.Close()
+		v2reader := buf.NewReader(conn1)
+		if err := buf.Copy(v2reader, input); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	responseDone := signal.ExecuteAsync(func() error {
+		v2writer := buf.NewWriter(conn1)
+		if err := buf.Copy(output, v2writer); err != nil {
+			return err
+		}
+		return nil
+	})
+
 	go func() {
-		for {
-			var buffer [1500]byte
-			buf, err := ray.InboundOutput().ReadMultiBuffer()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			n, err := buf.Read(buffer[:])
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			conn1.Write(buffer[:n])
+		if err := signal.ErrorOrFinish2(ctx, requestDone, responseDone); err != nil {
+			input.CloseError()
+			output.CloseError()
+			return
 		}
 	}()
-	go func() {
-		for {
-			mb := buf.NewMultiBufferCap(65536)
-			var buffer [1500]byte
-			n, err := conn1.Read(buffer[:])
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			mb.Write(buffer[:n])
-			err = ray.InboundInput().WriteMultiBuffer(mb)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		}
-	}()
+
 	return conn2, nil
 }
 

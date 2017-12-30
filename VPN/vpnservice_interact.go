@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"reflect"
+	"syscall"
+	"unsafe"
 
 	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
 	"github.com/xiaokangwang/AndroidLibV2ray/Process/Escort"
@@ -97,6 +99,7 @@ type VPNSupport struct {
 
 func (v *VPNSupport) startNextGen() {
 	tapfd := v.VpnSupportSet.GetVPNFd()
+	syscall.SetNonblock(tapfd, false)
 	f := os.NewFile(uintptr(tapfd), "/dev/tap0")
 	cfg := new(voconfigure.WaVingOceanConfigure)
 	cfg.PublicOnly = false
@@ -116,8 +119,10 @@ func (v *VPNSupport) stopNextGen() {
 
 func (v *VPNSupport) getSpace() app.Space {
 	VpV := reflect.ValueOf(v.status.Vpoint)
-	Space := VpV.FieldByName("space")
-	s := Space.Interface().(app.Space)
+	Space := VpV.Elem().FieldByName("space")
+	//unsafely neutralize unexport field protection
+	Space = reflect.NewAt(Space.Type(), unsafe.Pointer(Space.UnsafeAddr()))
+	s := Space.Elem().Interface().(app.Space)
 	return s
 }
 
