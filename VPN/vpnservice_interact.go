@@ -3,9 +3,7 @@ package VPN
 import (
 	"context"
 	"os"
-	"reflect"
 	"syscall"
-	"unsafe"
 
 	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
 	"github.com/xiaokangwang/AndroidLibV2ray/Process/Escort"
@@ -15,7 +13,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"v2ray.com/core/app"
+	"v2ray.com/core"
 	"v2ray.com/core/transport/internet"
 )
 
@@ -105,7 +103,7 @@ func (v *VPNSupport) startNextGen() {
 	cfg.PublicOnly = false
 	cfg.EnableDnsCache = false
 	cfg.DNSServers = make([]string, 0)
-	v.lowerup = wavingocean.NewLowerUp(*cfg, f, &V2Dialer{ser: v.getSpace()}, context.TODO())
+	v.lowerup = wavingocean.NewLowerUp(*cfg, f, &V2Dialer{ser: v.status.Vpoint.(*core.Instance)}, context.TODO())
 	go v.lowerup.Up()
 }
 
@@ -115,15 +113,6 @@ func (v *VPNSupport) OptinNextGenerationTunInterface() {
 
 func (v *VPNSupport) stopNextGen() {
 	v.lowerup.Down()
-}
-
-func (v *VPNSupport) getSpace() app.Space {
-	VpV := reflect.ValueOf(v.status.Vpoint)
-	Space := VpV.Elem().FieldByName("space")
-	//unsafely neutralize unexport field protection
-	Space = reflect.NewAt(Space.Type(), unsafe.Pointer(Space.UnsafeAddr()))
-	s := Space.Elem().Interface().(app.Space)
-	return s
 }
 
 type V2RayVPNServiceSupportsSet interface {
