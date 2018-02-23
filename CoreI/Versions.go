@@ -1,5 +1,5 @@
 package CoreI
 
 func CheckVersion() int {
-	return 26
+	return 27
 }
