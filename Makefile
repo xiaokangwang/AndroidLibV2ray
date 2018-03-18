@@ -22,6 +22,8 @@ fetchDep:
 
 ANDROID_HOME=$(HOME)/android-sdk-linux
 export ANDROID_HOME
+PATH=$(PATH):$(GOPATH)/bin
+export PATH
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
