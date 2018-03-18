@@ -22,7 +22,7 @@ fetchDep:
 
 ANDROID_HOME=$(HOME)/android-sdk-linux
 export ANDROID_HOME
-PATH=$(PATH):$(GOPATH)/bin
+PATH:=$(PATH):$(GOPATH)/bin
 export PATH
 downloadGoMobile:
 	go get golang.org/x/mobile/cmd/gomobile
