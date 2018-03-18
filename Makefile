@@ -25,7 +25,7 @@ export ANDROID_HOME
 PATH:=$(PATH):$(GOPATH)/bin
 export PATH
 downloadGoMobile:
-	go get golang.org/x/mobile/cmd/gomobile
+	go get golang.org/x/mobile/cmd/...
 	sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
 	cd ~ ;curl -L https://gist.githubusercontent.com/xiaokangwang/4a0f19476d86213ef6544aa45b3d2808/raw/b5c308b43d231e785b869844b7b341e5c098b84b/ubuntu-cli-install-android-sdk.sh | sudo bash -
 	ls ~
