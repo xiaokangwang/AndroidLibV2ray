@@ -5,6 +5,9 @@ go:
 go_import_path: github.com/xiaokangwang/AndroidLibV2ray
 git:
   depth: 5
+addons:
+  apt:
+    update: true
 before_script:
 - sudo ntpdate -u time.google.com
 - date
