@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.10"
+  - "1.11"
 go_import_path: github.com/xiaokangwang/AndroidLibV2ray
 git:
   depth: 5
@@ -13,7 +13,6 @@ before_script:
 - date
 - make all
 - make downloadGoMobile
-- make buildVGO
 script:
 - go test -p 1 -tags json -v github.com/xiaokangwang/AndroidLibV2ray/...
 - make BuildMobile
@@ -24,7 +23,6 @@ deploy:
     secure: M5ad7tjHLbr2vA64wVbVHRE/aSYar/l7EXx7SuMfg+ccyWFHWcNBJdElCnYxK5cpPJKSR9CqFOy4W3Qe6FBfhK2LjLWjAANeWFFdt5yC9mtE5z0AXuOLu8FgIAXob8MvzMgBc7lop3/sb2EoLagzQdtU7fZce1Z6PZL7UZ8qrynzvfOkv6gG9qIbR3y//i1ZJuhHT8WTtCPPUkCkb+Dnd7cP/j4d0sYoSEDhMR4iqOV6KcBRIfE/knL8yOhDXOrWP/TiWFaBchBzm3J4vxGqC6D2QKgmgFZwF+3l3kCOoXUj/FDe31tDCJI87OxXBvA/60OQfFbtyb/7Rk/2SxRmBm/3uiwFwBntlxkuqtJVVK2RQsFhJMjt6XE+BYmNY4+H4/V3Nkj56vRuhdQSM8bJAvz5MqiI8YPVAwpdANlTFOOyeARdb5cSzsklYSxJivmt+tj0nH9vpOx7f0dNYKhRZzKwSjLFRn/LDj/+XnM/LNYwgJmIWCBz0BJEV+yK5zirGi7ualJmWUfNjPy2TpE4b95Dm4TtdwsS1E39hY6aaVMKzJtMUtJohBdCnQFvCjSDUEXGZTLV3ODvtQu0S2Rj+gkiYhzWiWTt+EZIdC+0APNduq+Ngu8HpRugsMiCVaL76nQpErW+aP3auzN5WJY8zQSvMZvA9BfAEBrkACEDjss=
   file:
     - libv2ray.aar
-    - V2RayGO/app/build/outputs/apk/release/app-release.apk
   skip_cleanup: true
   on:
     tags: true
